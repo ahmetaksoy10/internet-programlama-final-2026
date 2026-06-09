@@ -16,10 +16,21 @@ import travio1 from '../assets/projects/travio1.png'
 import travio2 from '../assets/projects/travio2.png'
 import travio3 from '../assets/projects/travio3.png'
 import travio4 from '../assets/projects/travio4.png'
+import travio5 from '../assets/projects/travio5.png'
+import travio6 from '../assets/projects/travio6.png'
+import travio7 from '../assets/projects/travio7.png'
 import subgrave1 from '../assets/projects/subgrave1.png'
 import subgrave2 from '../assets/projects/subgrave2.png'
 import subgrave3 from '../assets/projects/subgrave3.png'
 import subgrave4 from '../assets/projects/subgrave4.png'
+import travelguide1 from '../assets/projects/travelguide1.png'
+import travelguide2 from '../assets/projects/travelguide2.png'
+import travelguide3 from '../assets/projects/travelguide3.png'
+import travelguide4 from '../assets/projects/travelguide4.png'
+import travelguide5 from '../assets/projects/travelguide5.png'
+import travelguide6 from '../assets/projects/travelguide6.png'
+import travelguide7 from '../assets/projects/travelguide7.png'
+import travelguide8 from '../assets/projects/travelguide8.png'
 
 // --- Proje verileri ---
 // gorseller: modalda gösterilecek ekran görüntüleri (boş dizi → placeholder)
@@ -30,28 +41,40 @@ const projeler = [
     icon: Map,
     durum: 'Tamamlandı',
     aciklama:
-      "Türkiye'deki turistik yerleri keşfetmeyi sağlayan bir masaüstü gezi rehberi uygulaması.",
+      "Türkiye'nin 81 ilini interaktif şehir kartları, kişisel seyahat planlayıcısı ve 19 rozetlik başarım sistemiyle keşfettiren, oyunlaştırılmış masaüstü gezi rehberi uygulaması.",
     detayliAciklama:
-      "Python, PyQt5 ve SQLite kullanarak geliştirdiğim masaüstü uygulama. Kullanıcılar Türkiye'deki şehirleri ve turistik yerleri arayabilir, favorilerine ekleyebilir ve gezi planı oluşturabilir. Veritabanı tasarımı, CRUD işlemleri ve kullanıcı arayüzü geliştirme konularında deneyim kazandım.",
-    teknolojiler: ['Python', 'PyQt5', 'SQLite'],
+      "Python ve PyQt5 ile geliştirilen masaüstü uygulaması, Türkiye'nin 81 ilini emoji, bölge, tarihçe, gezilecek yerler ve yöresel mutfak bilgileriyle detaylı bir veritabanında sunuyor. Kullanıcılar her şehri 'Gittim', 'Gitmek İstiyorum' ve 'Favori' olarak işaretleyip 5 yıldız puanlama, kişisel not ve valiz hazırlık listesi oluşturabiliyor. 19 rozetlik başarım sistemi, haftalık seri (streak), 6 seviyeli ilerleme ve keşif puanıyla bir oyunlaştırma katmanı kuruluyor; PDF gezi karnesi, favori dışa aktarma ve anlık açık/koyu tema da destekleniyor. Tüm veriler SQLite ile cihazda saklanıyor (sıfır backend, çevrimdışı çalışır) ve 94 Lucide SVG ikon runtime'da retina netliğinde boyanıyor. Katmanlı modüler mimari (main / ui_components / database / styles / icons) sayesinde UI katmanı hiç doğrudan SQL yazmıyor.",
+    teknolojiler: ['Python', 'PyQt5', 'SQLite', 'QSS'],
     repoLink: 'https://github.com/ahmetaksoy10',
-    gorseller: [],
+    gorseller: [
+      { src: travelguide1, alt: 'Giriş ekranı' },
+      { src: travelguide2, alt: 'Kayıt — Aramıza Katıl' },
+      { src: travelguide3, alt: 'Ana ekran — keşif paneli, arama ve öne çıkan şehirler' },
+      { src: travelguide4, alt: 'Listelerim — keşfedilen şehirler ve yıldız puanları' },
+      { src: travelguide5, alt: 'Şehir planlayıcı — durum, yıldız puanı ve kişisel not' },
+      { src: travelguide6, alt: 'Şehir rehberi — tarihçe, özellikler ve gezilecek yerler' },
+      { src: travelguide7, alt: 'Ayarlar — hesap, görünüm ve veri yönetimi' },
+      { src: travelguide8, alt: 'Rozetlerim — 19 başarım, seviye ve keşif puanı' },
+    ],
   },
   {
     ad: 'Travio',
     icon: Plane,
     durum: 'Geliştiriliyor',
     aciklama:
-      'Uçak ve otobüs bileti karşılaştırma, otel rezervasyonu ve yapay zeka destekli rota planlamasını tek çatı altında toplayan iOS seyahat süper uygulaması.',
+      'Uçak, otobüs ve otel aramayı tek platformda birleştiren, Google Gemini AI ile kişiye özel gün-gün tatil planı üreten iOS seyahat uygulaması.',
     detayliAciklama:
-      'SwiftUI ve MVVM + Coordinator mimarisiyle geliştirilen Travio, Duffel API üzerinden gerçek uçak/otel rezervasyonu, Travio Mind adlı AI asistanıyla (Google Gemini API) doğal dilde tatil planı oluşturma, Iyzico 3D Secure ödeme, Firebase Authentication (e-posta, Apple, Google) ve RevenueCat ile premium abonelik (Travio Plus) özelliklerini sunuyor. Tüm API anahtarları Firebase Functions backend\'inde tutularak güvenlik sağlanıyor. Repository Pattern sayesinde API sağlayıcıları tek dosya değişimiyle değiştirilebiliyor.',
-    teknolojiler: ['SwiftUI', 'Firebase', 'Gemini AI', 'Duffel API', 'Iyzico'],
+      'SwiftUI ve feature-based MVVM + Repository Pattern ile geliştirilen Travio; Duffel API üzerinden gerçek uçuş/otel rezervasyonu, Google Gemini ile doğal dilden gün-gün rota planı üretimi ve Iyzico 3D Secure kart ödemesini uçtan uca tek akışta birleştiriyor. Travio Mind asistanı destinasyon, bütçe, ilgi alanı ve tempoya göre ulaşım–konaklama–aktivite–bütçe dökümlü bir plan oluşturup doğal dil komutlarıyla yeniden düzenliyor. Firebase Authentication (e-posta + Google), RevenueCat ile Travio Plus aboneliği (7 gün deneme, Gemini Pro yönlendirme) ve MapKit otel haritası gibi özellikler içeriyor. Tüm hassas anahtarlar (Gemini, Duffel, Iyzico) iOS bundle\'a hiç girmeden Firebase Functions backend\'inde tutuluyor; kullanıcı başı rate limiting, PCI-uyumlu ödeme ve jailbreak-proof Plus doğrulamasıyla güvenlik katmanlı kurgulanıyor.',
+    teknolojiler: ['SwiftUI', 'Firebase Functions', 'Gemini AI', 'Duffel API', 'Iyzico', 'RevenueCat'],
     repoLink: 'https://github.com/ahmetaksoy10',
     gorseller: [
-      { src: travio1, alt: 'Ana Sayfa — trend rotalar ve AI rota arama' },
-      { src: travio2, alt: 'Planlarım — onaylı biletler ve yaklaşan seyahatler' },
-      { src: travio3, alt: 'Arama — uçak / otobüs filtresi ve tarih seçimi' },
-      { src: travio4, alt: 'Profil — Travio Plus aboneliği ve seyahat karnem' },
+      { src: travio1, alt: 'Açılış ekranı — Travio logosu' },
+      { src: travio2, alt: 'Giriş — e-posta, Apple ve Google ile oturum açma' },
+      { src: travio3, alt: 'Hesap oluşturma — kayıt formu' },
+      { src: travio4, alt: 'Keşfet — kategoriler, AI rota asistanı ve trend rotalar' },
+      { src: travio5, alt: 'Arama — uçak ve otobüs sefer arama formu' },
+      { src: travio6, alt: 'Planlarım — onaylı uçuş ve otobüs rezervasyonları' },
+      { src: travio7, alt: 'Profil — Travio Plus ve seyahat istatistikleri' },
     ],
   },
   {
@@ -59,10 +82,10 @@ const projeler = [
     icon: Leaf,
     durum: 'Geliştiriliyor',
     aciklama:
-      'Dijital aboneliklerini takip eden, iptal edilenleri "mezarlığa gömen" ve harcamaları analiz eden iOS abonelik mezarlığı uygulaması.',
+      'Dijital abonelikleri "yaşayan" ve "ölen" olarak takip eden, iptal edilenleri mezar taşlarında sergileyen ve harcamaları analiz eden, benzersiz anlatımlı iOS abonelik mezarlığı uygulaması.',
     detayliAciklama:
-      'SwiftUI ve MVVM mimarisiyle geliştirilen Subgrave, "Abonelik Mezarlığı" konseptiyle benzersiz bir deneyim sunuyor. 4 ana sekme: Dashboard (metrik kartları, yıllık harcama grafiği), Yaşayanlar (aktif abonelik listesi, arama/filtreleme), Mezarlık (iptal edilen aboneliklerin mezar taşları) ve İstatistik (harcama analizleri). 30+ gün kullanılmayan abonelikler otomatik "hayalet" olarak işaretlenir. İptal edilen abonelikler neden + veda notuyla gömülür, isteğe bağlı olarak "diriltilir". Yenilemeden 3 gün önce yerel bildirim gönderilir. Siri Shortcuts ile kullanım takibi otomasyonu desteklenir. Krem/fildişi arka plan, lavanta aksan renkleri ve mezar taşı custom shape\'leri ile sıcak bahçe teması uygulanmıştır.',
-    teknolojiler: ['SwiftUI', 'MVVM', 'SwiftData', 'Siri Shortcuts'],
+      'SwiftUI ve MVVM + Repository Pattern ile geliştirilen Subgrave, abonelik takibini "Abonelik Mezarlığı" metaforuyla yeniden kurguluyor. 4 sekme: Dashboard (4 metrik kartı, 12 aylık harcama grafiği, yaklaşan yenilemeler), Yaşayanlar (aktif abonelikler — arama, filtreleme, 5 sıralama), Mezarlık (iptal edilenler custom TombstoneShape mezar taşlarında, epitaf ve veda notuyla) ve İstatistik (Spotify Wrapped tarzı yıllık rapor, Swift Charts donut grafiği). 30+ gün kullanılmayan abonelikler otomatik "hayalet" olarak işaretleniyor; yenilemeden 3 gün önce yerel bildirim gönderiliyor ve AppIntents ile "uygulama açıldığında kullanıldı işaretle" Siri otomasyonu kurulabiliyor. iOS 17 Observation framework (@Observable), SwiftData kalıcılığı ve Protocol-Oriented DI ile sıfır backend, tamamen çevrimdışı çalışan modern bir mimari benimsiyor.',
+    teknolojiler: ['SwiftUI', 'SwiftData', 'Swift Charts', 'AppIntents', 'MVVM'],
     repoLink: 'https://github.com/ahmetaksoy10',
     gorseller: [
       { src: subgrave1, alt: 'Dashboard — metrik kartları ve yıllık harcama grafiği' },
