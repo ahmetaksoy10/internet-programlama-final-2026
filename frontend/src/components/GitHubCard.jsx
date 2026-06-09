@@ -28,6 +28,8 @@ import {
   RefreshCw,
   Users,
 } from 'lucide-react'
+// Sayıları 0'dan hedefe artırarak gösteren bileşen
+import CountUp from './CountUp.jsx'
 
 // Verisini çekeceğimiz GitHub kullanıcı adı (tek yerde tanımlı, kolay değişir).
 const GITHUB_KULLANICI = 'ahmetaksoy10'
@@ -164,24 +166,30 @@ function GitHubCard() {
         <div className="gh-stats">
           <span className="gh-stat">
             <FolderGit2 size={14} aria-hidden="true" />
-            <strong>{istatistik.repo}</strong> repo
+            {/* Sayılar 0'dan gerçek değere doğru animasyonla artar */}
+            <strong><CountUp value={istatistik.repo} /></strong> repo
           </span>
           <span className="gh-stat">
             <Users size={14} aria-hidden="true" />
-            <strong>{istatistik.takipci}</strong> takipçi
+            <strong><CountUp value={istatistik.takipci} /></strong> takipçi
           </span>
           <span className="gh-stat">
-            <strong>{istatistik.takip}</strong> takip
+            <strong><CountUp value={istatistik.takip} /></strong> takip
           </span>
         </div>
       )}
 
-      {/* DURUM 1: Yükleniyor */}
+      {/* DURUM 1: Yükleniyor → düz yazı yerine "skeleton" (parıltılı) kutular */}
       {yukleniyor && (
-        <div className="gh-status">
-          <span className="spinner" aria-hidden="true" />
-          <span>Veriler yükleniyor…</span>
-        </div>
+        <ul className="commit-list" aria-hidden="true">
+          {[0, 1, 2, 3].map((i) => (
+            <li key={i} className="commit-skeleton">
+              <span className="sk sk--repo" />
+              <span className="sk sk--msg" />
+              <span className="sk sk--meta" />
+            </li>
+          ))}
+        </ul>
       )}
 
       {/* DURUM 2: Hata */}

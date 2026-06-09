@@ -13,6 +13,9 @@
 
   /* Kart */
   --card-bg: #ffffff;
+  /* Cam (glassmorphism) zemini: yarı saydam → ardındaki aurora hafif sızar.
+     backdrop-filter ile birleşince buzlu cam etkisi verir. */
+  --card-glass: rgba(255, 255, 255, 0.72);
   --card-border: rgba(0, 0, 0, 0.06);
 
   /* Metin renkleri */
@@ -78,11 +81,104 @@ h1, h2, h3 {
   line-height: 1.25;
 }
 
-/* .page: içeriği ortalayan ve genişliği sınırlayan kapsayıcı */
+/* .page: içeriği ortalayan ve genişliği sınırlayan kapsayıcı.
+   position+z-index: arka plan katmanlarının (aurora/parçacıklar) üstünde kalır. */
 .page {
+  position: relative;
+  z-index: 1;
   max-width: 1180px;
   margin: 0 auto;
   padding: 3rem 1.5rem 2rem;
+}
+
+/* ============================================================= */
+/*  === ARKA PLAN KATMANLARI (AURORA + PARÇACIKLAR) ===          */
+/*  Her ikisi de fixed, içeriğin ardında (z-index:0), tıklama    */
+/*  almaz (pointer-events:none). Dekoratif, göze batmayan.       */
+/* ============================================================= */
+.aurora,
+.particles {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Aurora: yavaşça süzülen soluk pastel ışık lekeleri */
+.aurora {
+  overflow: hidden; /* blob'lar taşıp yatay kaydırma yaratmasın */
+}
+.aurora__blob {
+  position: absolute;
+  border-radius: 50%;
+  /* Blur biraz azaltıldı → leke daha belirgin ama yine yumuşak */
+  filter: blur(58px);
+  opacity: 0.78;
+  will-change: transform;
+}
+/* Yumuşak pastel ama bu sefer fark edilir tonlar */
+.aurora__blob--1 {
+  width: 46vw;
+  height: 46vw;
+  top: -10%;
+  left: -6%;
+  background: radial-gradient(circle at center, #ffc9ad, transparent 70%); /* şeftali */
+  animation: auroraDrift1 28s ease-in-out infinite alternate;
+}
+.aurora__blob--2 {
+  width: 42vw;
+  height: 42vw;
+  top: 28%;
+  right: -8%;
+  background: radial-gradient(circle at center, #c9bdf6, transparent 70%); /* lavanta */
+  animation: auroraDrift2 34s ease-in-out infinite alternate;
+}
+.aurora__blob--3 {
+  width: 40vw;
+  height: 40vw;
+  bottom: -12%;
+  left: 20%;
+  background: radial-gradient(circle at center, #aee3d4, transparent 70%); /* nane */
+  animation: auroraDrift3 31s ease-in-out infinite alternate;
+}
+
+/* Çok yavaş, küçük genlikli süzülme — sakin bir his verir */
+@keyframes auroraDrift1 {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(6%, 8%) scale(1.12); }
+}
+@keyframes auroraDrift2 {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-7%, 5%) scale(1.1); }
+}
+@keyframes auroraDrift3 {
+  0% { transform: translate(0, 0) scale(1.05); }
+  100% { transform: translate(5%, -6%) scale(1); }
+}
+
+/* ============================================================= */
+/*  === ODAK HALKALARI (erişilebilirlik) ===                     */
+/*  Klavyeyle gezenler için belirgin, fareyle tıklayanları       */
+/*  rahatsız etmeyen :focus-visible odak göstergesi.            */
+/* ============================================================= */
+a:focus-visible,
+button:focus-visible,
+.theme-toggle:focus-visible,
+.project-item:focus-visible {
+  outline: 2px solid var(--accent-focus);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* ============================================================= */
+/*  === YUMUŞAK TEMA GEÇİŞİ ===                                  */
+/*  Tema değişirken (theme-anim sınıfı kısa süre aktifken)       */
+/*  renkler aniden değil yumuşakça geçer.                       */
+/* ============================================================= */
+.theme-anim,
+.theme-anim * {
+  transition: background-color 0.4s ease, color 0.35s ease,
+              border-color 0.4s ease !important;
 }
 
 /* ============================================================= */
@@ -208,7 +304,10 @@ h1, h2, h3 {
 /* ============================================================= */
 .card {
   position: relative;
-  background: var(--card-bg);
+  /* Camsı (buzlu cam) zemin: yarı saydam + arkasını bulanıklaştırır */
+  background: var(--card-glass);
+  -webkit-backdrop-filter: blur(12px) saturate(1.1);
+  backdrop-filter: blur(12px) saturate(1.1);
   border: 1px solid var(--card-border);
   /* Üst kenarda kartın kendi vurgu rengiyle ince bir çizgi */
   border-top: 3px solid var(--card-accent, var(--accent-about));
@@ -229,12 +328,10 @@ h1, h2, h3 {
   transform: translateY(0);
 }
 
-/* Hover: kart %2 büyür, gölgesi derinleşir, hafif renk tonu alır
-   (yalnızca görünür olan kartlarda) */
+/* Hover: kart %2 büyür ve gölgesi derinleşir (yalnızca görünür kartlarda) */
 .card.is-visible:hover {
   transform: scale(1.02);
   box-shadow: var(--shadow-hover);
-  background: color-mix(in srgb, var(--card-accent, var(--accent-about)) 3%, var(--tint-base));
 }
 
 /* Kart başlığı (ikon + metin) */
@@ -288,8 +385,12 @@ h1, h2, h3 {
 /*  === FOCUS KARTI (öne çıkarılmış) ===                         */
 /* ============================================================= */
 .card--focus {
-  /* Çok hafif gradient: "bu kart farklı" hissi verir ama göz yormaz */
-  background: linear-gradient(135deg, #fff5f5 0%, #ffffff 60%);
+  /* Cam zeminin üzerine çok hafif mercan tonu (yarı saydam → cam korunur) */
+  background-image: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent-focus) 16%, transparent) 0%,
+    transparent 60%
+  );
   /* Üst accent çizgisi diğerlerinden biraz daha kalın (vurgu için) */
   border-top-width: 4px;
 }
@@ -724,6 +825,37 @@ h1, h2, h3 {
   color: var(--text-muted);
 }
 
+/* --- Yükleme iskeleti (skeleton) — parıltılı (shimmer) gri kutular --- */
+.commit-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  border: 1px solid var(--card-border);
+}
+.sk {
+  height: 12px;
+  border-radius: 6px;
+  /* Soldan sağa kayan parıltı için yatay gradyan */
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--text-muted) 16%, transparent) 25%,
+    color-mix(in srgb, var(--text-muted) 34%, transparent) 50%,
+    color-mix(in srgb, var(--text-muted) 16%, transparent) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.3s ease-in-out infinite;
+}
+.sk--repo { width: 45%; }
+.sk--msg  { width: 82%; }
+.sk--meta { width: 60%; height: 10px; }
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 .gh-status {
   display: flex;
   align-items: center;
@@ -959,6 +1091,7 @@ h1, h2, h3 {
   font-weight: 600;
 }
 .clap__btn {
+  position: relative; /* kalp parçacıklarını konumlandırmak için */
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
@@ -980,6 +1113,21 @@ h1, h2, h3 {
 /* Tıklama anındaki küçük zıplama animasyonu */
 .clap__btn--pop {
   animation: pop 0.3s ease;
+}
+/* Kalp patlaması parçacıkları: butonun üstünde yukarı süzülüp kaybolur */
+.heart-particle {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  color: var(--accent-focus);
+  fill: var(--accent-focus);
+  pointer-events: none;
+  animation: floatUp 0.85s ease-out forwards;
+}
+/* --dx: her parçacığın yatay kayması (ClapButton'dan inline gelir) */
+@keyframes floatUp {
+  0%   { opacity: 1; transform: translate(0, 0) scale(0.6); }
+  100% { opacity: 0; transform: translate(var(--dx, 0), -38px) scale(1.1); }
 }
 
 /* ============================================================= */
@@ -1236,6 +1384,8 @@ h1, h2, h3 {
   --bg-primary: #14141b;
   --bg-secondary: #1d1d27;
   --card-bg: #20202c;
+  /* Karanlıkta cam: koyu yarı saydam → aurora hafif sızar, metin okunur kalır */
+  --card-glass: rgba(32, 32, 44, 0.66);
   --card-border: rgba(255, 255, 255, 0.09);
 
   --text-primary: #f2f2f7;
@@ -1257,7 +1407,8 @@ h1, h2, h3 {
   --shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.6);
 }
 
-/* Odak kartının açık-pembe gradyanı karanlıkta koyu-sıcak tona döner */
-:root[data-theme='dark'] .card--focus {
-  background: linear-gradient(135deg, #2a2030 0%, var(--card-bg) 60%);
+/* Karanlık temada aurora biraz kısık: koyu gökyüzünde renkli bir parıltı */
+:root[data-theme='dark'] .aurora__blob {
+  opacity: 0.4;
 }
+

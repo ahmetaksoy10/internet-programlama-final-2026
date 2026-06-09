@@ -6,6 +6,8 @@
 // =============================================================
 
 import { BookOpen, Book } from 'lucide-react'
+// İlerleme yüzdesini 0'dan hedefe sayarak gösteren bileşen
+import CountUp from './CountUp.jsx'
 
 // Okuma ilerlemesi yüzdesi (ilerleme çubuğunun genişliği için).
 const OKUMA_YUZDE = 40
@@ -36,7 +38,7 @@ function BooksCard() {
           <div className="progress">
             <div className="progress__labels">
               <span>Okuyorum</span>
-              <span className="progress__value">%{OKUMA_YUZDE}</span>
+              <span className="progress__value">%<CountUp value={OKUMA_YUZDE} /></span>
             </div>
             <div
               className="progress__track"

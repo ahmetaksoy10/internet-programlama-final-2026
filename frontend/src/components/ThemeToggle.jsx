@@ -32,11 +32,21 @@ function ThemeToggle() {
 
   const karanlikMi = tema === 'dark'
 
+  // Temayı değiştir + geçişi yumuşat.
+  // 'theme-anim' sınıfı kısa süreliğine eklenir; CSS bu sırada renkleri
+  // yumuşakça geçirir, sonra kaldırılır (kalıcı geçiş maliyeti olmasın).
+  function temayiDegistir() {
+    document.documentElement.classList.add('theme-anim')
+    setTema(karanlikMi ? 'light' : 'dark')
+    window.setTimeout(() => {
+      document.documentElement.classList.remove('theme-anim')
+    }, 450)
+  }
+
   return (
     <button
       className="theme-toggle"
-      // Tıklayınca temayı tersine çevir
-      onClick={() => setTema(karanlikMi ? 'light' : 'dark')}
+      onClick={temayiDegistir}
       aria-label={karanlikMi ? 'Aydınlık temaya geç' : 'Karanlık temaya geç'}
       title={karanlikMi ? 'Aydınlık tema' : 'Karanlık tema'}
     >

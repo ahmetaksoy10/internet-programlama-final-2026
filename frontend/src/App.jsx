@@ -3,9 +3,6 @@
 // -------------------------------------------------------------
 //  Görevi: Sayfanın genel iskeletini kurmak ve kartların scroll'da
 //  belirme (reveal) animasyonunu yönetmek.
-//  - En üstte Header (profil + tema değiştirici)
-//  - Ortada <main> içinde kartların yer aldığı 3 sütunlu BENTO GRID
-//  - En altta Footer
 //
 //  BENTO GRID tiling (masaüstü, 3 sütun, boşluksuz):
 //   [About(1) Focus(2)] [Music(1) Books(1) Battery(1)] [Projects(3)]
@@ -13,6 +10,8 @@
 // =============================================================
 
 import { useEffect, useRef } from 'react'
+import AuroraBackground from './components/AuroraBackground.jsx'
+import FloatingParticles from './components/FloatingParticles.jsx'
 import Header from './components/Header.jsx'
 import AboutCard from './components/AboutCard.jsx'
 import FocusCard from './components/FocusCard.jsx'
@@ -31,8 +30,8 @@ function App() {
   const gridRef = useRef(null)
 
   // --- Scroll'da belirme (reveal) animasyonu ---
-  // IntersectionObserver, bir öğe ekrana girdiğinde haber verir. Biz de o karta
-  // 'is-visible' sınıfı ekleyip CSS geçişiyle yumuşakça belirmesini sağlıyoruz.
+  // IntersectionObserver: kart ekrana girince 'is-visible' sınıfı eklenir,
+  // CSS geçişiyle yumuşakça belirir.
   useEffect(() => {
     const grid = gridRef.current
     if (!grid) return
@@ -41,42 +40,43 @@ function App() {
     const gozlemci = new IntersectionObserver(
       (girisler) => {
         girisler.forEach((giris) => {
-          // Kart ekranda görünür hale geldiyse animasyonu tetikle
           if (giris.isIntersecting) {
             giris.target.classList.add('is-visible')
-            // Bir kez göründükten sonra izlemeyi bırak (performans)
-            gozlemci.unobserve(giris.target)
+            gozlemci.unobserve(giris.target) // bir kez göründü, takibi bırak
           }
         })
       },
-      { threshold: 0.15 }, // kartın %15'i görününce tetiklensin
+      { threshold: 0.15 },
     )
-
     kartlar.forEach((kart) => gozlemci.observe(kart))
-
-    // Temizleme: bileşen kaldırılınca gözlemciyi kapat
     return () => gozlemci.disconnect()
   }, [])
 
   return (
-    <div className="page">
-      <Header />
+    <>
+      {/* Arka plan katmanları (içeriğin ardında, fixed, dekoratif) */}
+      <AuroraBackground />
+      <FloatingParticles />
 
-      <main className="cards-grid" ref={gridRef} aria-label="Şu an içeriği">
-        <AboutCard />
-        <FocusCard />
-        <MusicCard />
-        <BooksCard />
-        <BatteryCard />
-        <ProjectsCard />
-        <HighlightsCard />
-        <TechStackCard />
-        <BacklogCard />
-        <GitHubCard />
-      </main>
+      <div className="page">
+        <Header />
 
-      <Footer />
-    </div>
+        <main className="cards-grid" ref={gridRef} aria-label="Şu an içeriği">
+          <AboutCard />
+          <FocusCard />
+          <MusicCard />
+          <BooksCard />
+          <BatteryCard />
+          <ProjectsCard />
+          <HighlightsCard />
+          <TechStackCard />
+          <BacklogCard />
+          <GitHubCard />
+        </main>
+
+        <Footer />
+      </div>
+    </>
   )
 }
 

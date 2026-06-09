@@ -7,6 +7,8 @@
 // =============================================================
 
 import { Coffee } from 'lucide-react'
+// Yüzdeyi 0'dan hedefe sayarak gösteren bileşen
+import CountUp from './CountUp.jsx'
 
 // --- Enerji verileri ---
 // İleride güncellemek için sadece bu iki değeri değiştirmek yeterli.
@@ -43,9 +45,9 @@ function BatteryCard() {
         />
       </div>
 
-      {/* Büyük yüzde yazısı (renk de yüzdeye göre) */}
+      {/* Büyük yüzde yazısı (renk de yüzdeye göre, sayı animasyonla artar) */}
       <p className="battery-percent" style={{ color: renk }}>
-        %{energyLevel}
+        %<CountUp value={energyLevel} />
       </p>
 
       {/* Esprili durum mesajı + kahve ikonu */}
