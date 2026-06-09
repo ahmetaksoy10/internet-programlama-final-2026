@@ -9,6 +9,8 @@
 
 // Lucide React ikonları (sistem emojisi yerine tutarlı SVG ikonlar)
 import { UserCircle2, Sparkles, MapPin, CalendarClock } from 'lucide-react'
+// Aydınlık/karanlık tema değiştirici buton
+import ThemeToggle from './ThemeToggle.jsx'
 
 function Header() {
   // --- Son güncelleme tarihi ---
@@ -23,6 +25,9 @@ function Header() {
   return (
     // Semantik <header>: sayfanın giriş/başlık bölümü
     <header className="header">
+      {/* Sağ üst köşede tema değiştirici (aydınlık/karanlık) */}
+      <ThemeToggle />
+
       {/* === SOL: Profil fotoğrafı === */}
       {/* .profile-photo sınıfı, ileride gerçek <img> ile kolay değişim için ayrıldı. */}
       <div className="profile-photo">

@@ -31,6 +31,15 @@
   --accent-books: #00b894;       /* Yeşil — Kitap */
   --accent-tech: #0984e3;        /* Mavi — Tech Stack */
   --accent-contact: #f0a500;     /* Altın — İletişim (kontrast için biraz koyu) */
+  --accent-backlog: #6c5ce7;     /* Koyu mor — Sıradakiler (Backlog) */
+  --accent-battery: #00b894;     /* Yeşil — Enerji Seviyesi */
+
+  /* Tema-bağımlı yüzey tonları.
+     --tint-base: yumuşak/şeffaf renk karışımlarında (color-mix) zemin rengi.
+     Aydınlıkta beyaz, karanlıkta koyu olur → tinted yüzeyler her temada doğru görünür. */
+  --tint-base: #ffffff;
+  --surface-2: #f8f8fa;          /* commit kutuları gibi ikincil yüzeyler */
+  --dot-color: rgba(0, 0, 0, 0.04); /* GitHub kartı noktalı desen rengi */
 
   /* Gölgeler */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
@@ -80,11 +89,35 @@ h1, h2, h3 {
 /*  === HEADER (profil + bio) ===                                */
 /* ============================================================= */
 .header {
+  position: relative; /* tema butonunu köşeye konumlandırmak için */
   display: flex;
   align-items: center;
   gap: 1.75rem;
   margin-bottom: 2.25rem;
   animation: fadeSlideUp 0.5s ease both;
+}
+
+/* Aydınlık/karanlık tema değiştirici buton (sağ üst köşe) */
+.theme-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  color: var(--text-secondary);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform 0.25s ease, color 0.25s ease, background 0.25s ease;
+}
+.theme-toggle:hover {
+  transform: scale(1.08) rotate(-8deg);
+  color: var(--accent-focus);
 }
 
 /* Profil fotoğrafı alanı (şimdilik ikon placeholder) */
@@ -182,19 +215,26 @@ h1, h2, h3 {
   border-radius: var(--radius-md);
   padding: 1.5rem;
   box-shadow: var(--shadow-md);
-  /* Hover geçişi: yumuşak bir cubic-bezier eğrisi */
-  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-              box-shadow 0.3s ease, background 0.3s ease;
-  /* Yüklenme animasyonu: aşağıdan kayarak belirme (stagger alt tarafta) */
-  animation: fadeSlideUp 0.5s ease forwards;
-  opacity: 0; /* animasyon başlamadan görünmez */
+  /* Hover + belirme geçişleri (yumuşak cubic-bezier eğrisi) */
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              box-shadow 0.3s ease, background 0.3s ease, opacity 0.5s ease;
+  /* Scroll'da belirme: başta gizli ve hafif aşağıda; .is-visible eklenince görünür.
+     'is-visible' sınıfı App.jsx'teki IntersectionObserver tarafından eklenir. */
+  opacity: 0;
+  transform: translateY(24px);
+}
+/* Kart ekrana girince: tam görünür ve yerine oturur */
+.card.is-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-/* Hover: kart %2 büyür, gölgesi derinleşir, hafif renk tonu alır */
-.card:hover {
+/* Hover: kart %2 büyür, gölgesi derinleşir, hafif renk tonu alır
+   (yalnızca görünür olan kartlarda) */
+.card.is-visible:hover {
   transform: scale(1.02);
   box-shadow: var(--shadow-hover);
-  background: color-mix(in srgb, var(--card-accent, var(--accent-about)) 3%, white);
+  background: color-mix(in srgb, var(--card-accent, var(--accent-about)) 3%, var(--tint-base));
 }
 
 /* Kart başlığı (ikon + metin) */
@@ -212,7 +252,7 @@ h1, h2, h3 {
   height: 38px;
   border-radius: 11px;
   color: var(--card-accent, var(--accent-about));
-  background: color-mix(in srgb, var(--card-accent, var(--accent-about)) 13%, white);
+  background: color-mix(in srgb, var(--card-accent, var(--accent-about)) 13%, var(--tint-base));
   flex-shrink: 0;
 }
 .card__title {
@@ -236,13 +276,13 @@ h1, h2, h3 {
 .card--about      { --card-accent: var(--accent-about); }
 .card--focus      { --card-accent: var(--accent-focus); }
 .card--projects   { --card-accent: var(--accent-projects); }
-.card--training   { --card-accent: var(--accent-training); }
 .card--highlights { --card-accent: var(--accent-highlights); }
 .card--github     { --card-accent: var(--accent-github); }
 .card--music      { --card-accent: var(--accent-music); }
 .card--books      { --card-accent: var(--accent-books); }
 .card--tech       { --card-accent: var(--accent-tech); }
-.card--contact    { --card-accent: var(--accent-contact); }
+.card--backlog    { --card-accent: var(--accent-backlog); }
+.card--battery    { --card-accent: var(--accent-battery); }
 
 /* ============================================================= */
 /*  === FOCUS KARTI (öne çıkarılmış) ===                         */
@@ -280,10 +320,10 @@ h1, h2, h3 {
   /* Kartın vurgu renginden türeyen yumuşak gradyan zemin */
   background: linear-gradient(
     135deg,
-    color-mix(in srgb, var(--card-accent, var(--accent-about)) 12%, white),
-    color-mix(in srgb, var(--card-accent, var(--accent-about)) 4%, white)
+    color-mix(in srgb, var(--card-accent, var(--accent-about)) 12%, var(--tint-base)),
+    color-mix(in srgb, var(--card-accent, var(--accent-about)) 4%, var(--tint-base))
   );
-  border: 1px dashed color-mix(in srgb, var(--card-accent, var(--accent-about)) 35%, white);
+  border: 1px dashed color-mix(in srgb, var(--card-accent, var(--accent-about)) 35%, var(--tint-base));
   border-radius: var(--radius-sm);
   color: color-mix(in srgb, var(--card-accent, var(--accent-about)) 70%, var(--text-muted));
   text-align: center;
@@ -335,7 +375,7 @@ h1, h2, h3 {
 /* Hover/odak: tıklanabilir olduğunu vurgulamak için hafif renk değişimi */
 .project-item:hover,
 .project-item:focus-visible {
-  background: color-mix(in srgb, var(--card-accent) 6%, white);
+  background: color-mix(in srgb, var(--card-accent) 6%, var(--tint-base));
   border-color: color-mix(in srgb, var(--card-accent) 35%, var(--card-border));
 }
 
@@ -381,7 +421,7 @@ h1, h2, h3 {
   border-radius: 999px;
   font-size: 0.74rem;
   font-weight: 700;
-  background: color-mix(in srgb, var(--card-accent) 14%, white);
+  background: color-mix(in srgb, var(--card-accent) 14%, var(--tint-base));
   color: color-mix(in srgb, var(--card-accent) 72%, var(--text-primary));
 }
 
@@ -414,7 +454,7 @@ h1, h2, h3 {
   background: linear-gradient(
     90deg,
     var(--card-accent),
-    color-mix(in srgb, var(--card-accent) 55%, white)
+    color-mix(in srgb, var(--card-accent) 55%, var(--tint-base))
   );
   transition: width 0.6s ease;
 }
@@ -448,7 +488,7 @@ h1, h2, h3 {
   gap: 0.35rem;
   padding: 0.25rem 0.7rem;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--card-accent) 14%, white);
+  background: color-mix(in srgb, var(--card-accent) 14%, var(--tint-base));
   color: color-mix(in srgb, var(--card-accent) 70%, var(--text-primary));
   font-size: 0.8rem;
   font-weight: 700;
@@ -462,8 +502,8 @@ h1, h2, h3 {
   margin-top: 0.85rem;
   padding: 0.45rem 0.8rem;
   border-radius: var(--radius-sm);
-  border: 1px dashed color-mix(in srgb, var(--card-accent) 35%, white);
-  background: color-mix(in srgb, var(--card-accent) 6%, white);
+  border: 1px dashed color-mix(in srgb, var(--card-accent) 35%, var(--tint-base));
+  background: color-mix(in srgb, var(--card-accent) 6%, var(--tint-base));
   color: var(--text-muted);
   font-size: 0.82rem;
   font-weight: 600;
@@ -495,14 +535,14 @@ h1, h2, h3 {
   border-radius: var(--radius-sm);
   font-size: 0.82rem;
   font-weight: 700;
-  background: color-mix(in srgb, var(--card-accent) 12%, white);
+  background: color-mix(in srgb, var(--card-accent) 12%, var(--tint-base));
   color: color-mix(in srgb, var(--card-accent) 75%, var(--text-primary));
-  border: 1px solid color-mix(in srgb, var(--card-accent) 22%, white);
+  border: 1px solid color-mix(in srgb, var(--card-accent) 22%, var(--tint-base));
   transition: background 0.25s ease, transform 0.25s ease;
 }
 /* Hover'da chip biraz daha doygun renge geçer */
 .chip:hover {
-  background: color-mix(in srgb, var(--card-accent) 22%, white);
+  background: color-mix(in srgb, var(--card-accent) 22%, var(--tint-base));
   transform: translateY(-1px);
 }
 
@@ -632,6 +672,58 @@ h1, h2, h3 {
 /* ============================================================= */
 /*  === GITHUB KARTI (canlı veri) ===                            */
 /* ============================================================= */
+/* Kartın arka planına çok silik noktalı grid deseni (teknik/terminal hissi) */
+.card--github {
+  background-image: radial-gradient(circle, var(--dot-color) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+/* Canlı bağlantı rozeti: yanıp sönen yeşil nokta + "Canlı" yazısı */
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: auto; /* başlık satırında sağa yasla */
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #00a844;
+}
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #00c853;
+  display: inline-block;
+  animation: pulse 2s ease-in-out infinite;
+}
+/* Profil istatistikleri satırı (repo / takipçi / takip) */
+.gh-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--card-border);
+}
+.gh-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+.gh-stat strong {
+  color: var(--text-primary);
+}
+/* Son veri çekme zamanı (alt köşe, küçük gri) */
+.gh-refreshed {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 1rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
 .gh-status {
   display: flex;
   align-items: center;
@@ -652,7 +744,7 @@ h1, h2, h3 {
 .gh-error {
   color: var(--accent-focus);
   font-weight: 600;
-  background: color-mix(in srgb, var(--accent-focus) 8%, white);
+  background: color-mix(in srgb, var(--accent-focus) 8%, var(--tint-base));
   padding: 0.7rem 0.9rem;
   border-radius: var(--radius-sm);
 }
@@ -662,43 +754,232 @@ h1, h2, h3 {
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 0.85rem;
 }
+/* Commit kartı artık tıklanabilir bir <a> — link stillerini sıfırlıyoruz */
 .commit-item {
+  position: relative;
+  display: block;
   padding: 0.8rem 1rem;
   border-radius: var(--radius-sm);
-  /* Çok hafif nötr gri zemin (koyu DEĞİL) — sayfanın açık temasıyla uyumlu */
-  background: #f8f8fa;
+  /* Tema-duyarlı ikincil yüzey (koyu DEĞİL, açık temada hafif gri) */
+  background: var(--surface-2);
   border: 1px solid var(--card-border);
-  transition: border-color 0.25s ease;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.25s ease, border-color 0.25s ease;
 }
 .commit-item:hover {
+  background: color-mix(in srgb, var(--card-accent) 7%, var(--surface-2));
   border-color: color-mix(in srgb, var(--card-accent) 45%, var(--card-border));
 }
-.commit-item__repo,
-.commit-item__msg,
-.commit-item__date {
+/* Üst satır: repo adı (solda) + dal etiketi (sağda) */
+.commit-item__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+.commit-item__repo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 700;
+  color: var(--card-accent);
+}
+/* Dal (branch) etiketi */
+.commit-branch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: color-mix(in srgb, var(--card-accent) 12%, var(--tint-base));
+  color: color-mix(in srgb, var(--card-accent) 70%, var(--text-primary));
+}
+.commit-item__msg {
   display: flex;
   align-items: center;
   gap: 0.45rem;
-}
-.commit-item__repo {
-  font-weight: 700;
-  color: var(--card-accent);
-  margin-bottom: 0.3rem;
-}
-.commit-item__msg {
   color: var(--text-primary);
   font-size: 0.92rem;
-  margin-bottom: 0.3rem;
-}
-.commit-item__date {
-  color: var(--text-muted);
-  font-size: 0.8rem;
+  margin-bottom: 0.45rem;
 }
 /* Uzun commit mesajları tek satırda kısalır (…) */
 .commit-item__msg span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+/* Alt satır: kısa hash + tarih */
+.commit-item__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.commit-hash {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: 'Courier New', monospace; /* mono-font: teknik/kod hissi */
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.commit-item__date {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+/* Hover'da beliren dış bağlantı ikonu (sağ alt köşe) */
+.commit-item__ext {
+  position: absolute;
+  right: 0.7rem;
+  bottom: 0.7rem;
+  color: var(--card-accent);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.commit-item:hover .commit-item__ext {
+  opacity: 1;
+}
+
+/* ============================================================= */
+/*  === SIRADAKİLER (BACKLOG) KARTI ===                          */
+/* ============================================================= */
+.backlog-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+.backlog-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.55rem 0;
+  color: var(--text-secondary);
+  font-size: 0.94rem;
+  border-bottom: 1px solid var(--card-border);
+}
+.backlog-item:last-child {
+  border-bottom: none;
+}
+.backlog-item__icon {
+  color: var(--card-accent);
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+/* Tamamlanmış öğe: üzeri çizili ve soluk */
+.backlog-item--done {
+  color: var(--text-muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--text-muted);
+}
+.backlog-item--done .backlog-item__icon {
+  color: var(--accent-battery); /* tamamlandı → yeşil tik */
+}
+.backlog-note {
+  margin-top: 0.85rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ============================================================= */
+/*  === ENERJİ SEVİYESİ (BATTERY) KARTI ===                      */
+/* ============================================================= */
+/* Batarya çerçevesi (CSS ile çizim) */
+.battery-container {
+  width: 90px;
+  height: 38px;
+  border: 2.5px solid var(--text-secondary);
+  border-radius: 6px;
+  padding: 3px;
+  position: relative;
+  margin: 0.5rem auto 0;
+}
+/* Batarya başı (sağdaki küçük çıkıntı) */
+.battery-container::after {
+  content: '';
+  position: absolute;
+  right: -7px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 14px;
+  background: var(--text-secondary);
+  border-radius: 0 2px 2px 0;
+}
+/* Dolu kısım — genişlik ve renk inline style ile React'tan gelir */
+.battery-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease, background-color 0.5s ease;
+}
+/* Büyük yüzde yazısı */
+.battery-percent {
+  text-align: center;
+  font-family: 'Outfit', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0.6rem 0 0.4rem;
+}
+/* Esprili durum mesajı */
+.battery-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  text-align: left;
+}
+.battery-status svg {
+  color: var(--card-accent);
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+
+/* ============================================================= */
+/*  === ZİYARETÇİ ETKİLEŞİMİ (BEĞENİ) ===                        */
+/* ============================================================= */
+.clap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+.clap__label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.clap__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  color: var(--accent-focus);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+.clap__btn:hover {
+  background: color-mix(in srgb, var(--accent-focus) 10%, var(--tint-base));
+  transform: translateY(-2px);
+}
+/* Tıklama anındaki küçük zıplama animasyonu */
+.clap__btn--pop {
+  animation: pop 0.3s ease;
 }
 
 /* ============================================================= */
@@ -750,7 +1031,7 @@ h1, h2, h3 {
   transition: background 0.2s ease, color 0.2s ease;
 }
 .modal__close:hover {
-  background: color-mix(in srgb, var(--card-accent) 15%, white);
+  background: color-mix(in srgb, var(--card-accent) 15%, var(--tint-base));
   color: var(--card-accent);
 }
 .modal__head {
@@ -768,7 +1049,7 @@ h1, h2, h3 {
   height: 46px;
   border-radius: 12px;
   color: var(--card-accent);
-  background: color-mix(in srgb, var(--card-accent) 13%, white);
+  background: color-mix(in srgb, var(--card-accent) 13%, var(--tint-base));
   flex-shrink: 0;
 }
 .modal__title {
@@ -863,6 +1144,17 @@ h1, h2, h3 {
   0%, 100% { transform: scaleY(0.3); }
   50%      { transform: scaleY(1); }
 }
+/* Canlı indikatör nokta: yanıp sönme */
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.5; transform: scale(0.85); }
+}
+/* Beğeni butonu: tıklayınca küçük zıplama */
+@keyframes pop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
 /* Modal açılış: belirme + hafif büyüme */
 @keyframes modalOpen {
   from {
@@ -875,34 +1167,24 @@ h1, h2, h3 {
   }
 }
 
-/* Kartların sırayla (stagger) belirmesi — 10 kart için gecikmeler */
-.cards-grid > .card:nth-child(1)  { animation-delay: 0.05s; }
-.cards-grid > .card:nth-child(2)  { animation-delay: 0.10s; }
-.cards-grid > .card:nth-child(3)  { animation-delay: 0.15s; }
-.cards-grid > .card:nth-child(4)  { animation-delay: 0.20s; }
-.cards-grid > .card:nth-child(5)  { animation-delay: 0.25s; }
-.cards-grid > .card:nth-child(6)  { animation-delay: 0.30s; }
-.cards-grid > .card:nth-child(7)  { animation-delay: 0.35s; }
-.cards-grid > .card:nth-child(8)  { animation-delay: 0.40s; }
-.cards-grid > .card:nth-child(9)  { animation-delay: 0.45s; }
-.cards-grid > .card:nth-child(10) { animation-delay: 0.50s; }
+/* NOT: Kartların belirme animasyonu artık scroll'a bağlı (IntersectionObserver
+   ile '.is-visible' sınıfı eklenir). Sabit gecikmeli stagger kaldırıldı. */
 
 /* ============================================================= */
 /*  === RESPONSIVE (MEDIA QUERY) ===                            */
 /* ============================================================= */
 
-/* TABLET: 769px+ → 2 sütun. Tek hücre kartlar; sadece GitHub tam genişlik. */
+/* TABLET: 769px+ → 2 sütun. Tüm kartlar tek hücre (10 kart = temiz 5×2). */
 @media (min-width: 769px) {
   .cards-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  .card--github { grid-column: span 2; }
 }
 
 /* MASAÜSTÜ: 1025px+ → 3 sütunlu BENTO GRID.
    Kartların span değerleri, ızgarayı satır satır boşluksuz doldurur:
-   [About(1) Focus(2)] [Music(1) Books(1) Training(1)]
-   [Projects(3)] [Highlights(1) Tech(2)] [GitHub(3)] */
+   [About(1) Focus(2)] [Music(1) Books(1) Battery(1)]
+   [Projects(3)] [Highlights(1) Tech(2)] [Backlog(1) GitHub(2)] */
 @media (min-width: 1025px) {
   .cards-grid {
     grid-template-columns: repeat(3, 1fr);
@@ -910,7 +1192,7 @@ h1, h2, h3 {
   .card--focus    { grid-column: span 2; }
   .card--projects { grid-column: span 3; }
   .card--tech     { grid-column: span 2; }
-  .card--github   { grid-column: span 3; }
+  .card--github   { grid-column: span 2; }
 }
 
 /* MOBİL: 768px ve altı → fontları/boşlukları biraz daralt */
@@ -938,6 +1220,44 @@ h1, h2, h3 {
     transition: none !important;
   }
   .card {
-    opacity: 1 !important; /* animasyon kapalıyken kartlar görünür kalsın */
+    /* Animasyon kapalıyken kartlar gizli/kaymış kalmasın → görünür yap */
+    opacity: 1 !important;
+    transform: none !important;
   }
+}
+
+/* ============================================================= */
+/*  === KARANLIK TEMA ===                                        */
+/*  <html data-theme="dark"> olunca CSS değişkenleri yeniden     */
+/*  tanımlanır; tüm sayfa otomatik olarak koyu tona geçer.       */
+/*  (Değişkenler tek yerden değiştiği için her bileşen uyum sağlar.) */
+/* ============================================================= */
+:root[data-theme='dark'] {
+  --bg-primary: #14141b;
+  --bg-secondary: #1d1d27;
+  --card-bg: #20202c;
+  --card-border: rgba(255, 255, 255, 0.09);
+
+  --text-primary: #f2f2f7;
+  --text-secondary: #b9b9c8;
+  --text-muted: #8a8a9e;
+
+  /* color-mix zemin rengi: karanlıkta koyu olur → tinted yüzeyler doğru görünür */
+  --tint-base: #262633;
+  --surface-2: #1a1a24;
+  --dot-color: rgba(255, 255, 255, 0.05);
+
+  /* GitHub vurgu rengi koyu griydi; karanlıkta görünür olması için açık griye çevrilir */
+  --accent-github: #c7d0d8;
+
+  /* Karanlıkta gölgeler daha derin */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.55);
+  --shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.6);
+}
+
+/* Odak kartının açık-pembe gradyanı karanlıkta koyu-sıcak tona döner */
+:root[data-theme='dark'] .card--focus {
+  background: linear-gradient(135deg, #2a2030 0%, var(--card-bg) 60%);
 }

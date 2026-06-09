@@ -1,26 +1,33 @@
 // =============================================================
 //  GitHubCard.jsx — "GitHub'dan Canlı" kartı  (CANLI VERİ / API)
 // -------------------------------------------------------------
-//  Görevi: GitHub REST API'sinden hesabımın son herkese açık
-//  commit'lerini canlı olarak çekip listelemek.
+//  Görevi: GitHub REST API'sinden hesabımın profil istatistiklerini
+//  ve son herkese açık commit'lerini canlı olarak çekip göstermek.
 //
 //  Bu kart, dersin teknik özünü gösterir:
-//   - fetch() ile HTTP isteği (üstelik iki aşamalı)
+//   - fetch() ile HTTP isteği (üstelik çok aşamalı + paralel)
 //   - useEffect ile yan etki (side effect) yönetimi
 //   - useState ile veri / yükleniyor / hata durumlarının tutulması
 //   - Promise.all ile birden çok isteği PARALEL çalıştırma
 //   - Dizi (array) verisinin .map() ile listelenmesi
 //
 //  NOT: GitHub'ın "events" uç noktası commit MESAJINI içermez; yalnızca
-//  her push'un en son commit kimliğini (sha) verir. Bu yüzden mesajı almak
-//  için her push için ikinci bir istek ("o commit'in detayı") atıyoruz.
+//  her push'un en son commit kimliğini (sha) ve dalını (ref) verir. Bu yüzden
+//  mesajı almak için her push için ikinci bir istek ("o commit'in detayı") atıyoruz.
 // =============================================================
 
-// React'tan iki temel Hook'u içe aktarıyoruz:
-// - useState: bileşenin hafızasında veri tutmak için
-// - useEffect: bileşen ekrana geldiğinde (render) yan etki çalıştırmak için
 import { useState, useEffect } from 'react'
-import { Github, FolderGit2, MessageSquare, Calendar } from 'lucide-react'
+import {
+  Github,
+  FolderGit2,
+  MessageSquare,
+  Calendar,
+  Hash,
+  GitBranch,
+  ExternalLink,
+  RefreshCw,
+  Users,
+} from 'lucide-react'
 
 // Verisini çekeceğimiz GitHub kullanıcı adı (tek yerde tanımlı, kolay değişir).
 const GITHUB_KULLANICI = 'ahmetaksoy10'
@@ -28,93 +35,98 @@ const GITHUB_KULLANICI = 'ahmetaksoy10'
 const COMMIT_SAYISI = 5
 
 function GitHubCard() {
-  // --- 1) STATE TANIMLARI ---
-  // commitler: API'den gelip işlenen commit listesini tutar (başlangıçta boş dizi).
-  const [commitler, setCommitler] = useState([])
-  // yukleniyor: veri henüz gelmediyse true olur, ekranda "yükleniyor" gösteririz.
+  // --- STATE TANIMLARI ---
+  const [commitler, setCommitler] = useState([]) // işlenmiş commit listesi
+  const [istatistik, setIstatistik] = useState(null) // {repo, takipci, takip}
+  const [cekmeZamani, setCekmeZamani] = useState(null) // verinin çekildiği an
   const [yukleniyor, setYukleniyor] = useState(true)
-  // hata: istek başarısız olursa kullanıcıya gösterilecek hata mesajını tutar.
   const [hata, setHata] = useState(null)
 
-  // --- 2) VERİ ÇEKME (useEffect) ---
-  // useEffect'i boş bağımlılık dizisi [] ile kullanıyoruz; içindeki kod YALNIZCA
-  // bileşen İLK KEZ ekrana geldiğinde bir defa çalışır ("sayfa açıldı" anı gibi).
+  // --- VERİ ÇEKME (useEffect) ---
+  // Boş bağımlılık dizisi [] → kod yalnızca ilk render'da bir kez çalışır.
   useEffect(() => {
-    // useEffect fonksiyonunun kendisi async olamaz; bu yüzden içeride bir async
-    // yardımcı fonksiyon tanımlayıp hemen çağırıyoruz.
-    async function commitleriGetir() {
+    async function veriGetir() {
       try {
-        // === 1. AŞAMA: Kullanıcının son herkese açık olaylarını (events) çek ===
-        // await: isteğin yanıtı gelene kadar bekler, sonra devam eder.
-        const olayYaniti = await fetch(
-          `https://api.github.com/users/${GITHUB_KULLANICI}/events`,
-        )
-        // response.ok, HTTP durumu 200-299 aralığındaysa true olur (örn. 403 rate limit ise false).
+        // === 1. AŞAMA: Profil + olayları PARALEL çek ===
+        // Promise.all, iki isteği aynı anda başlatır; ikisi de bitince devam eder.
+        const [profilYaniti, olayYaniti] = await Promise.all([
+          fetch(`https://api.github.com/users/${GITHUB_KULLANICI}`),
+          fetch(`https://api.github.com/users/${GITHUB_KULLANICI}/events`),
+        ])
         if (!olayYaniti.ok) {
           throw new Error('GitHub olayları alınamadı: ' + olayYaniti.status)
         }
-        // Yanıt gövdesini JSON'a çeviriyoruz (en yeni olay en başta gelir).
+        const profil = await profilYaniti.json()
         const olaylar = await olayYaniti.json()
 
-        // Sadece "PushEvent" (kod gönderme) türündekileri süzüp en yeni 5 tanesini alıyoruz.
+        // Profil istatistiklerini state'e yaz (public repo sayısı, takipçi, takip)
+        setIstatistik({
+          repo: profil.public_repos,
+          takipci: profil.followers,
+          takip: profil.following,
+        })
+
+        // Sadece "PushEvent" türündekileri süzüp en yeni 5 tanesini alıyoruz.
         const pushOlaylari = olaylar
           .filter((olay) => olay.type === 'PushEvent')
           .slice(0, COMMIT_SAYISI)
 
-        // === 2. AŞAMA: Her push için commit'in MESAJINI ayrı istekle çek ===
-        // Promise.all, dizideki tüm istekleri aynı anda (paralel) başlatır ve
-        // hepsi tamamlanınca sonuçları sırayla bir diziye koyar. Bu, tek tek
-        // beklemekten çok daha hızlıdır.
+        // === 2. AŞAMA: Her push için commit detayını PARALEL çek ===
         const sonuc = await Promise.all(
           pushOlaylari.map(async (olay) => {
-            const repoTamAd = olay.repo.name // "kullanici/depo" biçiminde
-            const sha = olay.payload.head // push sonrası en son commit kimliği (sha)
+            const repoTamAd = olay.repo.name // "kullanici/depo"
+            const sha = olay.payload.head // push sonrası en son commit kimliği
+            // Dal (branch) adı: "refs/heads/main" → "main"
+            const dal = olay.payload.ref
+              ? olay.payload.ref.replace('refs/heads/', '')
+              : 'main'
             try {
-              // İlgili commit'in detayını çekiyoruz (mesaj ve tarih burada bulunur).
               const commitYaniti = await fetch(
                 `https://api.github.com/repos/${repoTamAd}/commits/${sha}`,
               )
               if (!commitYaniti.ok) throw new Error('commit detayı alınamadı')
               const commitVerisi = await commitYaniti.json()
               return {
-                repo: repoTamAd.split('/')[1] ?? repoTamAd, // sadece depo adı
-                mesaj: commitVerisi.commit.message.split('\n')[0], // mesajın ilk satırı
-                tarih: commitVerisi.commit.author.date, // commit'in atıldığı an
+                repo: repoTamAd.split('/')[1] ?? repoTamAd,
+                mesaj: commitVerisi.commit.message.split('\n')[0],
+                tarih: commitVerisi.commit.author.date,
                 sha,
+                kisaHash: sha.slice(0, 7), // commit'in ilk 7 karakteri
+                dal,
+                // Tarayıcıda açılacak commit sayfası (API yerine github.com)
+                url:
+                  commitVerisi.html_url ||
+                  `https://github.com/${repoTamAd}/commit/${sha}`,
               }
             } catch {
-              // İkincil istek başarısız olursa (örn. rate limit), elimizdeki
-              // bilgilerle bir yedek satır üretip kartın çalışmaya devam etmesini sağlıyoruz.
+              // İkincil istek başarısızsa elimizdeki bilgilerle yedek satır üret
               return {
                 repo: repoTamAd.split('/')[1] ?? repoTamAd,
-                mesaj:
-                  (olay.payload.ref?.replace('refs/heads/', '') ?? 'main') +
-                  ' dalına push yapıldı',
+                mesaj: `${dal} dalına push yapıldı`,
                 tarih: olay.created_at,
                 sha,
+                kisaHash: sha.slice(0, 7),
+                dal,
+                url: `https://github.com/${repoTamAd}/commit/${sha}`,
               }
             }
           }),
         )
 
-        // İşlenen commit listesini state'e kaydediyoruz → arayüz yeniden çizilir.
         setCommitler(sonuc)
+        setCekmeZamani(new Date()) // verinin çekildiği anı kaydet
       } catch (err) {
-        // Ağ hatası ya da yukarıda fırlatılan hatalar buraya düşer.
         console.error('GitHub verisi alınamadı:', err)
         setHata('GitHub verilerine şu an ulaşılamıyor.')
       } finally {
-        // Başarılı da olsa hatalı da olsa, yükleniyor durumunu kapatıyoruz.
         setYukleniyor(false)
       }
     }
 
-    // Tanımladığımız async fonksiyonu çağırıyoruz.
-    commitleriGetir()
-  }, []) // <-- boş dizi: efekt sadece ilk render'da bir kez çalışır.
+    veriGetir()
+  }, [])
 
-  // --- 3) Tarihi Türkçe ve okunabilir biçime çeviren yardımcı fonksiyon ---
-  // Örnek çıktı: "8 Haziran 2026, 14:30"
+  // --- Tarihi Türkçe biçime çeviren yardımcı (örn: "8 Haziran 2026, 14:30") ---
   function tarihiBicimlendir(isoTarih) {
     return new Date(isoTarih).toLocaleDateString('tr-TR', {
       day: 'numeric',
@@ -125,7 +137,14 @@ function GitHubCard() {
     })
   }
 
-  // --- 4) ARAYÜZ (render) ---
+  // --- Saati biçimlendiren yardımcı (örn: "14:30") ---
+  function saatiBicimlendir(tarih) {
+    return tarih.toLocaleTimeString('tr-TR', {
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
+
   return (
     <article className="card card--github">
       <div className="card__head">
@@ -133,9 +152,31 @@ function GitHubCard() {
           <Github size={20} />
         </span>
         <h2 className="card__title">GitHub'dan Canlı</h2>
+        {/* Canlı bağlantı indikatörü: yanıp sönen yeşil nokta + "Canlı" yazısı */}
+        <span className="live-badge" aria-label="Canlı veri">
+          <span className="live-dot" aria-hidden="true" />
+          Canlı
+        </span>
       </div>
 
-      {/* DURUM 1: Veri yükleniyorsa basit bir spinner + metin gösteriyoruz */}
+      {/* Profil istatistikleri (yüklendiyse göster) */}
+      {istatistik && (
+        <div className="gh-stats">
+          <span className="gh-stat">
+            <FolderGit2 size={14} aria-hidden="true" />
+            <strong>{istatistik.repo}</strong> repo
+          </span>
+          <span className="gh-stat">
+            <Users size={14} aria-hidden="true" />
+            <strong>{istatistik.takipci}</strong> takipçi
+          </span>
+          <span className="gh-stat">
+            <strong>{istatistik.takip}</strong> takip
+          </span>
+        </div>
+      )}
+
+      {/* DURUM 1: Yükleniyor */}
       {yukleniyor && (
         <div className="gh-status">
           <span className="spinner" aria-hidden="true" />
@@ -143,42 +184,73 @@ function GitHubCard() {
         </div>
       )}
 
-      {/* DURUM 2: Hata varsa kullanıcıyı nazikçe bilgilendiriyoruz */}
+      {/* DURUM 2: Hata */}
       {hata && !yukleniyor && <p className="gh-error">{hata}</p>}
 
-      {/* DURUM 3: Yükleme bitti, hata yok ama hiç commit gelmediyse */}
+      {/* DURUM 3: Veri yok */}
       {!yukleniyor && !hata && commitler.length === 0 && (
         <p className="card__text">
           Son zamanlarda herkese açık bir commit aktivitesi bulunamadı.
         </p>
       )}
 
-      {/* DURUM 4: Commit'ler geldiyse listeyi .map() ile basıyoruz */}
+      {/* DURUM 4: Commit listesi (.map ile) */}
       {!yukleniyor && !hata && commitler.length > 0 && (
         <ul className="commit-list">
           {commitler.map((commit, index) => (
-            // key: React'ın listeyi verimli güncellemesi için benzersiz değer.
-            <li key={commit.sha + '-' + index} className="commit-item">
-              {/* Repo adı satırı */}
-              <div className="commit-item__repo">
-                <FolderGit2 size={15} aria-hidden="true" />
-                <span>{commit.repo}</span>
-              </div>
+            <li key={commit.sha + '-' + index}>
+              {/* Her commit kartı tıklanabilir: yeni sekmede GitHub commit sayfası */}
+              <a
+                className="commit-item"
+                href={commit.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${commit.repo} deposundaki commit'i GitHub'da aç`}
+              >
+                {/* Üst satır: repo adı + dal (branch) etiketi */}
+                <div className="commit-item__top">
+                  <span className="commit-item__repo">
+                    <FolderGit2 size={15} aria-hidden="true" />
+                    {commit.repo}
+                  </span>
+                  <span className="commit-branch">
+                    <GitBranch size={12} aria-hidden="true" />
+                    {commit.dal}
+                  </span>
+                </div>
 
-              {/* Commit mesajı satırı */}
-              <div className="commit-item__msg">
-                <MessageSquare size={15} aria-hidden="true" />
-                <span>{commit.mesaj}</span>
-              </div>
+                {/* Commit mesajı */}
+                <div className="commit-item__msg">
+                  <MessageSquare size={15} aria-hidden="true" />
+                  <span>{commit.mesaj}</span>
+                </div>
 
-              {/* Tarih satırı (Türkçe formatlı) */}
-              <div className="commit-item__date">
-                <Calendar size={15} aria-hidden="true" />
-                <span>{tarihiBicimlendir(commit.tarih)}</span>
-              </div>
+                {/* Alt satır: kısa hash (mono) + tarih */}
+                <div className="commit-item__meta">
+                  <span className="commit-hash">
+                    <Hash size={13} aria-hidden="true" />
+                    {commit.kisaHash}
+                  </span>
+                  <span className="commit-item__date">
+                    <Calendar size={13} aria-hidden="true" />
+                    {tarihiBicimlendir(commit.tarih)}
+                  </span>
+                </div>
+
+                {/* Hover'da beliren dış bağlantı ikonu (sağ alt köşe) */}
+                <ExternalLink className="commit-item__ext" size={15} aria-hidden="true" />
+              </a>
             </li>
           ))}
         </ul>
+      )}
+
+      {/* Son veri çekme zamanı (alt köşe) */}
+      {cekmeZamani && (
+        <p className="gh-refreshed">
+          <RefreshCw size={13} aria-hidden="true" />
+          Son veri çekme: {saatiBicimlendir(cekmeZamani)}
+        </p>
       )}
     </article>
   )

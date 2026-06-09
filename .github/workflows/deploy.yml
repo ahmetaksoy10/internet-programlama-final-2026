@@ -1,0 +1,64 @@
+# GitHub Pages otomatik yayın akışı (workflow)
+# main dalına her push'ta: frontend build alınır ve GitHub Pages'e yayınlanır.
+# NOT: Bu akışın çalışması için depo ayarlarında
+#   Settings → Pages → Build and deployment → Source = "GitHub Actions"
+# seçili olmalıdır.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # Actions sekmesinden elle de çalıştırılabilir
+
+# Pages'e yayın için gerekli izinler
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Aynı anda tek yayın çalışsın (eskisini iptal et)
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend # tüm komutlar frontend/ içinde çalışır
+    steps:
+      - name: Depoyu çek
+        uses: actions/checkout@v4
+
+      - name: Node.js kur
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Bağımlılıkları yükle
+        run: npm ci
+
+      - name: Projeyi derle (build)
+        run: npm run build
+
+      - name: Pages için Vite yapılandırmasını ayarla
+        uses: actions/configure-pages@v5
+
+      - name: Build çıktısını yükle
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: frontend/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: GitHub Pages'e yayınla
+        id: deployment
+        uses: actions/deploy-pages@v4

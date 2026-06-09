@@ -7,6 +7,8 @@
 // =============================================================
 
 import { Github, Linkedin, Mail } from 'lucide-react'
+// Ziyaretçi etkileşimi: beğeni (alkış) butonu
+import ClapButton from './ClapButton.jsx'
 
 // --- Footer bağlantıları ---
 // Her bağlantı: ikon, görünen metin ve hedef adres (href).
@@ -39,6 +41,9 @@ function Footer() {
   return (
     // Semantik <footer> etiketi: sayfanın alt bilgi bölümünü temsil eder.
     <footer className="footer">
+      {/* Ziyaretçi etkileşimi: beğeni butonu */}
+      <ClapButton />
+
       {/* İlham / yıl satırı (dinamik) */}
       <p className="footer__note">nownownow.com'dan ilham alındı · {yil}</p>
 
