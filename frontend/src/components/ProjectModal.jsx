@@ -1,53 +1,72 @@
 // =============================================================
-//  ProjectModal.jsx — Proje detaylarını gösteren açılır pencere (modal)
+//  ProjectModal.jsx — Proje detaylarını gösteren açılır pencere
 // -------------------------------------------------------------
-//  Görevi: Bir projeye tıklandığında ekranın ortasında, o projenin
-//  uzun açıklamasını, teknolojilerini ve repo bağlantısını gösteren
-//  bir modal açmak.
-//
 //  Props:
-//   - proje   : Gösterilecek proje objesi (null ise modal kapalı demektir)
+//   - proje   : Gösterilecek proje objesi (null → modal kapalı)
 //   - onClose : Modalı kapatmak için çağrılan fonksiyon
+//
+//  Özellikler:
+//   - Ekran görüntüsü galerisi (ana görsel + thumbnail şeridi)
+//   - Durum rozeti (Tamamlandı / Geliştiriliyor / Devam Ediyor)
+//   - Sol/sağ ok tuşuyla ve thumbnail tıklamasıyla görsel değiştirme
+//   - ESC tuşu ile kapanma, overlay tıklaması ile kapanma
 // =============================================================
 
-import { useEffect } from 'react'
-import { X, ExternalLink } from 'lucide-react'
+import { useEffect, useState, useCallback } from 'react'
+import { createPortal } from 'react-dom'
+import { X, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react'
+
+// Durum rozeti için renk haritası
+const DURUM_RENK = {
+  'Tamamlandı':    'status--done',
+  'Geliştiriliyor': 'status--wip',
+  'Devam Ediyor':  'status--active',
+}
 
 function ProjectModal({ proje, onClose }) {
-  // --- ESC tuşu + sayfa kaydırma kilidi ---
-  // ÖNEMLİ: Bu efekt SADECE modal açıkken (proje doluyken) iş yapmalı.
-  // Aksi halde modal kapalıyken bile body'nin kaydırması kilitlenir.
-  useEffect(() => {
-    // Modal kapalıysa (proje yok) hiçbir şey yapma
-    if (!proje) return
+  const [aktifGorsel, setAktifGorsel] = useState(0)
 
-    // Klavyede ESC'e basılınca modalı kapatan dinleyici
+  // Farklı bir proje açılınca galeriyi sıfırla
+  useEffect(() => {
+    setAktifGorsel(0)
+  }, [proje?.ad])
+
+  const gorselSayisi = proje?.gorseller?.length ?? 0
+
+  const onceki = useCallback(() => {
+    setAktifGorsel((i) => (i - 1 + gorselSayisi) % gorselSayisi)
+  }, [gorselSayisi])
+
+  const sonraki = useCallback(() => {
+    setAktifGorsel((i) => (i + 1) % gorselSayisi)
+  }, [gorselSayisi])
+
+  useEffect(() => {
+    if (!proje) return
     function tusDinle(e) {
       if (e.key === 'Escape') onClose()
+      if (e.key === 'ArrowLeft' && gorselSayisi > 1) onceki()
+      if (e.key === 'ArrowRight' && gorselSayisi > 1) sonraki()
     }
     document.addEventListener('keydown', tusDinle)
-    // Modal açıkken arka plan sayfanın kaymasını engelliyoruz
     document.body.style.overflow = 'hidden'
-
-    // Temizleme: modal kapanınca (proje null olunca) dinleyiciyi kaldır,
-    // kaydırmayı geri aç.
     return () => {
       document.removeEventListener('keydown', tusDinle)
       document.body.style.overflow = ''
     }
-  }, [proje, onClose])
+  }, [proje, onClose, onceki, sonraki, gorselSayisi])
 
-  // proje null ise hiçbir şey çizme (modal kapalı)
   if (!proje) return null
 
-  // İlgili projenin Lucide ikonunu değişkene alıyoruz
   const Ikon = proje.icon
+  const durumSinifi = DURUM_RENK[proje.durum] ?? 'status--active'
 
-  return (
-    // Overlay: koyu yarı saydam arka plan. Üzerine tıklanınca modal kapanır.
+  // ÖNEMLİ: Modalı Portal ile doğrudan <body>'ye basıyoruz.
+  // Aksi halde Projeler kartının camsı (backdrop-filter) zemini, içindeki
+  // position:fixed overlay için "containing block" oluşturup modali ekran
+  // dışına kaydırıyor. Portal bu zincirden kurtarıp viewport'a sabitler.
+  return createPortal(
     <div className="modal-overlay" onClick={onClose} role="presentation">
-      {/* Modal kutusu. İçine yapılan tıklamanın overlay'e ulaşıp modalı
-          kapatmaması için stopPropagation kullanıyoruz. */}
       <div
         className="modal"
         role="dialog"
@@ -55,25 +74,89 @@ function ProjectModal({ proje, onClose }) {
         aria-labelledby="modal-title"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Sağ üst köşedeki kapatma butonu */}
+        {/* Kapatma butonu */}
         <button className="modal__close" onClick={onClose} aria-label="Kapat">
-          <X size={20} aria-hidden="true" />
+          <X size={18} aria-hidden="true" />
         </button>
 
-        {/* Başlık: proje ikonu + proje adı */}
+        {/* ── GÖRSEL GALERİSİ ── */}
+        {gorselSayisi > 0 && (
+          <div className="modal__gallery">
+            {/* Ana görsel */}
+            <div className="modal__gallery-main">
+              <img
+                key={aktifGorsel}
+                src={proje.gorseller[aktifGorsel].src}
+                alt={proje.gorseller[aktifGorsel].alt}
+                className="modal__gallery-img"
+              />
+
+              {/* Sayaç */}
+              {gorselSayisi > 1 && (
+                <span className="modal__gallery-counter" aria-live="polite">
+                  {aktifGorsel + 1} / {gorselSayisi}
+                </span>
+              )}
+
+              {/* Sol / Sağ oklar */}
+              {gorselSayisi > 1 && (
+                <>
+                  <button
+                    className="modal__gallery-arrow modal__gallery-arrow--left"
+                    onClick={onceki}
+                    aria-label="Önceki görsel"
+                  >
+                    <ChevronLeft size={18} />
+                  </button>
+                  <button
+                    className="modal__gallery-arrow modal__gallery-arrow--right"
+                    onClick={sonraki}
+                    aria-label="Sonraki görsel"
+                  >
+                    <ChevronRight size={18} />
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Thumbnail şeridi */}
+            {gorselSayisi > 1 && (
+              <div className="modal__thumbs" role="list" aria-label="Tüm görseller">
+                {proje.gorseller.map((g, i) => (
+                  <button
+                    key={i}
+                    role="listitem"
+                    className={`modal__thumb${i === aktifGorsel ? ' modal__thumb--active' : ''}`}
+                    onClick={() => setAktifGorsel(i)}
+                    aria-label={g.alt}
+                    aria-pressed={i === aktifGorsel}
+                  >
+                    <img src={g.src} alt="" aria-hidden="true" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── BAŞLIK + DURUM ── */}
         <div className="modal__head">
           <span className="modal__icon" aria-hidden="true">
-            <Ikon size={26} />
+            <Ikon size={24} />
           </span>
           <h2 id="modal-title" className="modal__title">
             {proje.ad}
           </h2>
+          {proje.durum && (
+            <span className={`modal__status ${durumSinifi}`}>{proje.durum}</span>
+          )}
         </div>
 
-        {/* Detaylı açıklama paragrafı */}
+        {/* ── AÇIKLAMA ── */}
         <p className="modal__desc">{proje.detayliAciklama}</p>
 
-        {/* Kullanılan teknolojiler (badge/chip) */}
+        {/* ── TEKNOLOJİLER ── */}
+        <p className="modal__section-label">Teknolojiler</p>
         <div className="tag-row modal__tags">
           {proje.teknolojiler.map((tek) => (
             <span key={tek} className="tag">
@@ -82,18 +165,19 @@ function ProjectModal({ proje, onClose }) {
           ))}
         </div>
 
-        {/* GitHub repo bağlantısı (şimdilik placeholder URL) */}
+        {/* ── REPO BUTONU ── */}
         <a
           className="modal__repo"
           href={proje.repoLink}
           target="_blank"
           rel="noopener noreferrer"
         >
-          <ExternalLink size={16} aria-hidden="true" />
+          <ExternalLink size={15} aria-hidden="true" />
           GitHub'da Görüntüle
         </a>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 

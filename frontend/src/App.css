@@ -446,6 +446,33 @@ button:focus-visible,
 .img-ph--square { aspect-ratio: 1 / 1; width: 100%; }
 .img-ph--cover  { aspect-ratio: 3 / 4; width: 100%; }
 
+/* Kart gövdesi: başlık/açıklama/etiket/footer'ı eşit boşlukla diz */
+.project-item__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+/* Alt satır: görsel sayısı ipucu + "Detaylar için tıkla" */
+.project-item__footer {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.15rem;
+}
+/* "4 görsel" rozeti — modalde galeri olduğunu sezdirir */
+.project-item__shots {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.73rem;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--card-accent) 75%, var(--text-muted));
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--card-accent) 10%, var(--tint-base));
+}
+
 /* ============================================================= */
 /*  === PROJELER KARTI ===                                       */
 /* ============================================================= */
@@ -480,11 +507,12 @@ button:focus-visible,
   border-color: color-mix(in srgb, var(--card-accent) 35%, var(--card-border));
 }
 
-/* "Detaylar için tıkla →" ipucu metni */
+/* "Detaylar için tıkla →" ipucu metni (footer'da sağa yaslı) */
 .project-item__cta {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
+  margin-left: auto;
   font-size: 0.78rem;
   font-weight: 700;
   color: var(--text-muted);
@@ -1142,30 +1170,112 @@ button:focus-visible,
   align-items: center;
   justify-content: center;
   padding: 1.25rem;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
 }
-/* Modal kutusu */
+
+/* ── MODAL KUTUSU ── */
 .modal {
   position: relative;
   width: 100%;
-  max-width: 560px;
-  max-height: 90vh;
+  max-width: 680px;
+  max-height: 92vh;
   overflow-y: auto;
   background: var(--card-bg);
   border-radius: var(--radius-lg);
-  padding: 1.75rem;
-  box-shadow: var(--shadow-lg);
-  /* Projeler kartının vurgu rengini modalda da kullanıyoruz (turkuaz) */
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
   --card-accent: var(--accent-projects);
   border-top: 4px solid var(--card-accent);
-  /* Açılış animasyonu: belirme + hafif büyüme */
   animation: modalOpen 0.25s ease;
+  /* Alt kısımda rahat nefes payı */
+  padding-bottom: 2rem;
 }
-/* Sağ üst kapatma butonu */
+
+/* Sağ üst kapatma butonu — galerinin üstüne çıkar, belirgin/kontrastlı */
 .modal__close {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: 0.9rem;
+  right: 0.9rem;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.modal__close:hover {
+  background: rgba(0, 0, 0, 0.78);
+  transform: scale(1.08);
+}
+
+/* ── GÖRSEL GALERİSİ ── */
+.modal__gallery {
+  margin-bottom: 0;
+}
+
+/* Ana görsel alanı: telefon ekranını sıkıştırmadan ortalar */
+.modal__gallery-main {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 300px;
+  padding: 1.4rem;
+  /* Düz zemin yerine vurgu renginden türeyen hafif gradient */
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--card-accent) 10%, var(--bg-secondary)),
+    var(--bg-secondary)
+  );
+  overflow: hidden;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+/* Görsel: yüksekliğe göre ölçeklenir, kenarlara yapışmaz, çerçeve hissi verir */
+.modal__gallery-img {
+  max-height: 400px;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+  /* Yeni görsel seçilince yumuşak belirme animasyonu */
+  animation: galleryFadeIn 0.2s ease;
+}
+@keyframes galleryFadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Görsel sayacı: sağ alt köşe */
+.modal__gallery-counter {
+  position: absolute;
+  bottom: 0.6rem;
+  right: 0.7rem;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+/* Sol / Sağ ok butonları */
+.modal__gallery-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1173,61 +1283,152 @@ button:focus-visible,
   height: 34px;
   border: none;
   border-radius: 50%;
-  background: var(--bg-secondary);
-  color: var(--text-secondary);
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
-.modal__close:hover {
-  background: color-mix(in srgb, var(--card-accent) 15%, var(--tint-base));
-  color: var(--card-accent);
+.modal__gallery-arrow:hover {
+  background: rgba(0, 0, 0, 0.6);
+  transform: translateY(-50%) scale(1.08);
 }
+.modal__gallery-arrow--left  { left: 0.65rem; }
+.modal__gallery-arrow--right { right: 0.65rem; }
+
+/* Thumbnail şeridi — ortalanmış, rahat tıklanabilir */
+.modal__thumbs {
+  display: flex;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.8rem 1.25rem;
+  background: var(--bg-secondary);
+  overflow-x: auto;
+  /* İnce, tema uyumlu scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: var(--card-border) transparent;
+}
+
+.modal__thumb {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 2px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  background: none;
+  opacity: 0.62;
+  transition: opacity 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+.modal__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  pointer-events: none;
+}
+.modal__thumb:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
+}
+.modal__thumb--active {
+  border-color: var(--card-accent);
+  opacity: 1;
+}
+
+/* ── BAŞLIK SATIRI (ikon + isim + durum) ── */
 .modal__head {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
-  margin-bottom: 1rem;
-  padding-right: 2.5rem; /* kapatma butonuyla çakışmayı önler */
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin: 1.6rem 1.9rem 1rem;
+  padding-right: 1rem;
 }
 .modal__icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   border-radius: 12px;
   color: var(--card-accent);
   background: color-mix(in srgb, var(--card-accent) 13%, var(--tint-base));
   flex-shrink: 0;
 }
 .modal__title {
-  font-size: 1.4rem;
+  font-size: 1.35rem;
   font-weight: 700;
   color: var(--text-primary);
+  flex: 1;
+  min-width: 0;
 }
-.modal__desc {
-  color: var(--text-secondary);
-  margin-bottom: 1rem;
-}
-.modal__tags {
-  margin-bottom: 1.25rem;
-}
-.modal__repo {
+
+/* Durum rozeti */
+.modal__status {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  padding: 0.6rem 1.1rem;
+  padding: 0.2rem 0.65rem;
   border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+.status--done {
+  background: color-mix(in srgb, #00b894 16%, var(--tint-base));
+  color: color-mix(in srgb, #00b894 80%, var(--text-primary));
+}
+.status--wip {
+  background: color-mix(in srgb, #f0a500 16%, var(--tint-base));
+  color: color-mix(in srgb, #f0a500 90%, var(--text-primary));
+}
+.status--active {
+  background: color-mix(in srgb, #0984e3 16%, var(--tint-base));
+  color: color-mix(in srgb, #0984e3 80%, var(--text-primary));
+}
+
+/* ── İÇERİK ALANI ── */
+.modal__desc {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.8;
+  margin: 0 1.9rem 1.6rem;
+}
+
+/* Bölüm etiketi ("Teknolojiler") */
+.modal__section-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 1.9rem 0.7rem;
+}
+
+.modal__tags {
+  margin: 0 1.9rem 1.9rem;
+}
+
+/* GitHub butonu: tam genişlik, belirgin CTA */
+.modal__repo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0 1.9rem;
+  padding: 0.8rem 1.25rem;
+  border-radius: var(--radius-md);
   background: var(--card-accent);
   color: #fff;
   text-decoration: none;
   font-weight: 700;
-  font-size: 0.9rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-size: 0.95rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
 .modal__repo:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+  filter: brightness(1.08);
 }
 
 /* ============================================================= */
