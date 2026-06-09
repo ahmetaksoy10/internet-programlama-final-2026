@@ -1,0 +1,943 @@
+/* ============================================================= */
+/*  App.css — Tüm uygulama stilleri (Vanilla CSS, v2)            */
+/*  Tasarım dili: sıcak, ferah, "cozy" ama rafine.              */
+/*  Düzen: BENTO GRID (farklı genişlikte kartlar).              */
+/*  Tüm değerler CSS değişkenleriyle tek yerden yönetilir.      */
+/* ============================================================= */
+
+/* === GENEL DEĞİŞKENLER (TASARIM JETONLARI) === */
+:root {
+  /* Arka plan — çok hafif sıcak gri/krem */
+  --bg-primary: #faf8f5;
+  --bg-secondary: #f3f0eb;
+
+  /* Kart */
+  --card-bg: #ffffff;
+  --card-border: rgba(0, 0, 0, 0.06);
+
+  /* Metin renkleri */
+  --text-primary: #1a1a2e;
+  --text-secondary: #555566;
+  --text-muted: #8888a0;
+
+  /* Vurgu renkleri — her kart için farklı */
+  --accent-about: #6c63ff;       /* Mor — Hakkımda */
+  --accent-focus: #ff6b6b;       /* Mercan — Odak */
+  --accent-projects: #4ecdc4;    /* Turkuaz — Projeler */
+  --accent-training: #ff9f43;    /* Turuncu — Antrenman */
+  --accent-highlights: #a29bfe;  /* Lavanta — Son Gelişmeler */
+  --accent-github: #2d3436;      /* Koyu gri — GitHub */
+  --accent-music: #e84393;       /* Pembe — Müzik */
+  --accent-books: #00b894;       /* Yeşil — Kitap */
+  --accent-tech: #0984e3;        /* Mavi — Tech Stack */
+  --accent-contact: #f0a500;     /* Altın — İletişim (kontrast için biraz koyu) */
+
+  /* Gölgeler */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1);
+  --shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.12);
+
+  /* Köşe yuvarlaklığı */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+}
+
+/* === TEMEL SIFIRLAMA (RESET) === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  /* Gövde metni fontu: Nunito (sıcak, yuvarlak hatlı) */
+  font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+  color: var(--text-primary);
+  line-height: 1.65;
+  /* Çok hafif sıcak gradyan arka plan */
+  background: linear-gradient(160deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Başlıklar için Outfit fontu */
+h1, h2, h3 {
+  font-family: 'Outfit', 'Nunito', sans-serif;
+  line-height: 1.25;
+}
+
+/* .page: içeriği ortalayan ve genişliği sınırlayan kapsayıcı */
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 2rem;
+}
+
+/* ============================================================= */
+/*  === HEADER (profil + bio) ===                                */
+/* ============================================================= */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+  margin-bottom: 2.25rem;
+  animation: fadeSlideUp 0.5s ease both;
+}
+
+/* Profil fotoğrafı alanı (şimdilik ikon placeholder) */
+.profile-photo {
+  flex-shrink: 0;
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* İleride <img> ile değişince de bu zemin/çerçeve korunur */
+  background: linear-gradient(135deg, #fff, var(--bg-secondary));
+  border: 3px solid var(--card-bg);
+  box-shadow: var(--shadow-lg);
+  color: var(--accent-about);
+  overflow: hidden;
+}
+/* Gerçek görsel eklendiğinde kullanılacak sınıf (çerçeveyi tam doldurur) */
+.profile-photo__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.header__info {
+  flex: 1;
+  min-width: 0; /* uzun metinlerin taşmasını engeller */
+}
+
+/* Üst etiket (eyebrow) */
+.header__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--accent-focus);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.35rem;
+}
+
+.header__name {
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.header__bio {
+  margin: 0.5rem 0 0.9rem;
+  color: var(--text-secondary);
+  max-width: 620px;
+}
+
+/* Meta satırı: konum + güncelleme tarihi pill'leri */
+.header__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow-sm);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+/* ============================================================= */
+/*  === BENTO GRID (KART DÜZENİ) ===                             */
+/*  Mobil öncelikli: önce tek sütun, sonra genişleyen ekranlar. */
+/* ============================================================= */
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr; /* mobil: tek sütun */
+  gap: 1.25rem;
+}
+
+/* ============================================================= */
+/*  === KART TEMEL STİLİ ===                                     */
+/* ============================================================= */
+.card {
+  position: relative;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  /* Üst kenarda kartın kendi vurgu rengiyle ince bir çizgi */
+  border-top: 3px solid var(--card-accent, var(--accent-about));
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  /* Hover geçişi: yumuşak bir cubic-bezier eğrisi */
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              box-shadow 0.3s ease, background 0.3s ease;
+  /* Yüklenme animasyonu: aşağıdan kayarak belirme (stagger alt tarafta) */
+  animation: fadeSlideUp 0.5s ease forwards;
+  opacity: 0; /* animasyon başlamadan görünmez */
+}
+
+/* Hover: kart %2 büyür, gölgesi derinleşir, hafif renk tonu alır */
+.card:hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-hover);
+  background: color-mix(in srgb, var(--card-accent, var(--accent-about)) 3%, white);
+}
+
+/* Kart başlığı (ikon + metin) */
+.card__head {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.9rem;
+}
+.card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  color: var(--card-accent, var(--accent-about));
+  background: color-mix(in srgb, var(--card-accent, var(--accent-about)) 13%, white);
+  flex-shrink: 0;
+}
+.card__title {
+  font-size: 1.12rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.card__text {
+  color: var(--text-secondary);
+  margin-bottom: 0.6rem;
+}
+.card__text:last-child {
+  margin-bottom: 0;
+}
+.card__text strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+/* --- Her karta kendi vurgu rengini atayan değişkenler --- */
+.card--about      { --card-accent: var(--accent-about); }
+.card--focus      { --card-accent: var(--accent-focus); }
+.card--projects   { --card-accent: var(--accent-projects); }
+.card--training   { --card-accent: var(--accent-training); }
+.card--highlights { --card-accent: var(--accent-highlights); }
+.card--github     { --card-accent: var(--accent-github); }
+.card--music      { --card-accent: var(--accent-music); }
+.card--books      { --card-accent: var(--accent-books); }
+.card--tech       { --card-accent: var(--accent-tech); }
+.card--contact    { --card-accent: var(--accent-contact); }
+
+/* ============================================================= */
+/*  === FOCUS KARTI (öne çıkarılmış) ===                         */
+/* ============================================================= */
+.card--focus {
+  /* Çok hafif gradient: "bu kart farklı" hissi verir ama göz yormaz */
+  background: linear-gradient(135deg, #fff5f5 0%, #ffffff 60%);
+  /* Üst accent çizgisi diğerlerinden biraz daha kalın (vurgu için) */
+  border-top-width: 4px;
+}
+.card__pin {
+  position: absolute;
+  top: 1.1rem;
+  right: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: var(--accent-focus);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+/* ============================================================= */
+/*  === GÖRSEL PLACEHOLDER (yeniden kullanılabilir) ===          */
+/* ============================================================= */
+.img-ph {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  /* Kartın vurgu renginden türeyen yumuşak gradyan zemin */
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--card-accent, var(--accent-about)) 12%, white),
+    color-mix(in srgb, var(--card-accent, var(--accent-about)) 4%, white)
+  );
+  border: 1px dashed color-mix(in srgb, var(--card-accent, var(--accent-about)) 35%, white);
+  border-radius: var(--radius-sm);
+  color: color-mix(in srgb, var(--card-accent, var(--accent-about)) 70%, var(--text-muted));
+  text-align: center;
+  overflow: hidden;
+}
+.img-ph__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0 0.4rem;
+}
+/* Gerçek görsel eklendiğinde kutuyu tam dolduran sınıf */
+.img-ph__real {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* En-boy oranı varyantları */
+.img-ph--wide   { aspect-ratio: 16 / 9; width: 100%; }
+.img-ph--square { aspect-ratio: 1 / 1; width: 100%; }
+.img-ph--cover  { aspect-ratio: 3 / 4; width: 100%; }
+
+/* ============================================================= */
+/*  === PROJELER KARTI ===                                       */
+/* ============================================================= */
+.project-list {
+  list-style: none;
+  display: grid;
+  /* Geniş kartta projeler yan yana akar, darda tek sütuna iner */
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.1rem;
+}
+/* Proje kutusu artık bir <button> — buton varsayılan stillerini sıfırlıyoruz.
+   Tüm kutu tıklanabilir; tıklanınca detay modalı açılır. */
+.project-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.9rem;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-primary);
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+/* Hover/odak: tıklanabilir olduğunu vurgulamak için hafif renk değişimi */
+.project-item:hover,
+.project-item:focus-visible {
+  background: color-mix(in srgb, var(--card-accent) 6%, white);
+  border-color: color-mix(in srgb, var(--card-accent) 35%, var(--card-border));
+}
+
+/* "Detaylar için tıkla →" ipucu metni */
+.project-item__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.project-item:hover .project-item__cta {
+  color: var(--card-accent);
+}
+.project-item__head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.project-item__icon {
+  color: var(--card-accent);
+  flex-shrink: 0;
+}
+.project-item__name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.project-item__desc {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* Teknoloji etiketleri (badge) */
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.tag {
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  background: color-mix(in srgb, var(--card-accent) 14%, white);
+  color: color-mix(in srgb, var(--card-accent) 72%, var(--text-primary));
+}
+
+/* ============================================================= */
+/*  === ANTRENMAN & KİTAP — ortak ilerleme çubuğu ===            */
+/* ============================================================= */
+.progress {
+  margin-top: 0.6rem;
+}
+.progress__labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 0.35rem;
+}
+.progress__value {
+  color: var(--card-accent);
+}
+.progress__track {
+  height: 9px;
+  border-radius: 999px;
+  background: var(--bg-secondary);
+  overflow: hidden;
+}
+.progress__fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    var(--card-accent),
+    color-mix(in srgb, var(--card-accent) 55%, white)
+  );
+  transition: width 0.6s ease;
+}
+
+/* Antrenman ekipman listesi */
+.gear-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.gear-item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+}
+.gear-item__icon {
+  color: var(--card-accent);
+  flex-shrink: 0;
+}
+
+/* ============================================================= */
+/*  === SON GELİŞMELER KARTI ===                                 */
+/* ============================================================= */
+.place-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--card-accent) 14%, white);
+  color: color-mix(in srgb, var(--card-accent) 70%, var(--text-primary));
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+/* "Fotoğraflar yakında" notu (boş placeholder kutuları yerine sade bir satır) */
+.photos-soon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.85rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: var(--radius-sm);
+  border: 1px dashed color-mix(in srgb, var(--card-accent) 35%, white);
+  background: color-mix(in srgb, var(--card-accent) 6%, white);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+/* ============================================================= */
+/*  === TECH STACK KARTI ===                                     */
+/* ============================================================= */
+.tech-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 0.95rem;
+}
+.tech-group__title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+.chip {
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 700;
+  background: color-mix(in srgb, var(--card-accent) 12%, white);
+  color: color-mix(in srgb, var(--card-accent) 75%, var(--text-primary));
+  border: 1px solid color-mix(in srgb, var(--card-accent) 22%, white);
+  transition: background 0.25s ease, transform 0.25s ease;
+}
+/* Hover'da chip biraz daha doygun renge geçer */
+.chip:hover {
+  background: color-mix(in srgb, var(--card-accent) 22%, white);
+  transform: translateY(-1px);
+}
+
+/* ============================================================= */
+/*  === MÜZİK KARTI ===                                          */
+/* ============================================================= */
+.music-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.music-cover {
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: linear-gradient(135deg, var(--card-accent), #ff9ff3);
+  box-shadow: var(--shadow-sm);
+}
+.music-info__title {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.music-info__artist {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.4rem;
+}
+.music-info__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--card-accent);
+  text-decoration: none;
+}
+.music-info__link:hover {
+  text-decoration: underline;
+}
+
+/* ============================================================= */
+/*  === KİTAP KARTI ===                                          */
+/* ============================================================= */
+.book-row {
+  display: flex;
+  gap: 1rem;
+}
+.book-cover {
+  flex-shrink: 0;
+  width: 64px;
+  height: 88px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: linear-gradient(135deg, var(--card-accent), #55efc4);
+  box-shadow: var(--shadow-sm);
+}
+.book-info {
+  flex: 1;
+  min-width: 0;
+}
+.book-info__title {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.book-info__author {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.2rem;
+}
+
+/* ============================================================= */
+/*  === KİMİM BEN? — ikonlu madde listesi ===                    */
+/* ============================================================= */
+.info-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem; /* satırlar arası rahat boşluk */
+}
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  color: var(--text-secondary);
+  font-size: 0.94rem;
+}
+.info-item__icon {
+  color: var(--card-accent);
+  flex-shrink: 0;
+  margin-top: 0.1rem; /* ikon ilk satırla hizalı dursun */
+}
+
+/* ============================================================= */
+/*  === MÜZİK — "şu an çalıyor" ses dalgası (equalizer) ===      */
+/* ============================================================= */
+.music-info__titlerow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.sound-wave {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 18px;
+}
+.sound-wave .bar {
+  width: 3px;
+  background-color: var(--accent-music);
+  border-radius: 2px;
+  /* Her çubuk aynı animasyonu farklı gecikmeyle oynatır → dalga etkisi */
+  animation: wave 1s ease-in-out infinite;
+}
+.sound-wave .bar:nth-child(1) { animation-delay: 0s;    height: 60%; }
+.sound-wave .bar:nth-child(2) { animation-delay: 0.15s; height: 100%; }
+.sound-wave .bar:nth-child(3) { animation-delay: 0.3s;  height: 40%; }
+.sound-wave .bar:nth-child(4) { animation-delay: 0.45s; height: 80%; }
+
+/* ============================================================= */
+/*  === GITHUB KARTI (canlı veri) ===                            */
+/* ============================================================= */
+.gh-status {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  padding: 0.5rem 0;
+}
+.spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 3px solid var(--bg-secondary);
+  border-top-color: var(--card-accent);
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+.gh-error {
+  color: var(--accent-focus);
+  font-weight: 600;
+  background: color-mix(in srgb, var(--accent-focus) 8%, white);
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--radius-sm);
+}
+.commit-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 0.85rem;
+}
+.commit-item {
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius-sm);
+  /* Çok hafif nötr gri zemin (koyu DEĞİL) — sayfanın açık temasıyla uyumlu */
+  background: #f8f8fa;
+  border: 1px solid var(--card-border);
+  transition: border-color 0.25s ease;
+}
+.commit-item:hover {
+  border-color: color-mix(in srgb, var(--card-accent) 45%, var(--card-border));
+}
+.commit-item__repo,
+.commit-item__msg,
+.commit-item__date {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.commit-item__repo {
+  font-weight: 700;
+  color: var(--card-accent);
+  margin-bottom: 0.3rem;
+}
+.commit-item__msg {
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  margin-bottom: 0.3rem;
+}
+.commit-item__date {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+/* Uzun commit mesajları tek satırda kısalır (…) */
+.commit-item__msg span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================================= */
+/*  === PROJE DETAY MODALI ===                                   */
+/* ============================================================= */
+/* Overlay: tüm ekranı kaplayan koyu yarı saydam arka plan */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: rgba(0, 0, 0, 0.5);
+}
+/* Modal kutusu */
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  box-shadow: var(--shadow-lg);
+  /* Projeler kartının vurgu rengini modalda da kullanıyoruz (turkuaz) */
+  --card-accent: var(--accent-projects);
+  border-top: 4px solid var(--card-accent);
+  /* Açılış animasyonu: belirme + hafif büyüme */
+  animation: modalOpen 0.25s ease;
+}
+/* Sağ üst kapatma butonu */
+.modal__close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.modal__close:hover {
+  background: color-mix(in srgb, var(--card-accent) 15%, white);
+  color: var(--card-accent);
+}
+.modal__head {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 1rem;
+  padding-right: 2.5rem; /* kapatma butonuyla çakışmayı önler */
+}
+.modal__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  color: var(--card-accent);
+  background: color-mix(in srgb, var(--card-accent) 13%, white);
+  flex-shrink: 0;
+}
+.modal__title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.modal__desc {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+.modal__tags {
+  margin-bottom: 1.25rem;
+}
+.modal__repo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.6rem 1.1rem;
+  border-radius: 999px;
+  background: var(--card-accent);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.modal__repo:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ============================================================= */
+/*  === FOOTER ===                                               */
+/* ============================================================= */
+.footer {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--card-border);
+  text-align: center;
+}
+.footer__links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 0.8rem;
+}
+.footer__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.25s ease, color 0.25s ease;
+}
+.footer__link:hover {
+  color: var(--accent-focus);
+  transform: translateY(-2px);
+}
+.footer__note {
+  color: var(--text-muted);
+  font-size: 0.84rem;
+}
+
+/* ============================================================= */
+/*  === ANİMASYONLAR ===                                         */
+/* ============================================================= */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+/* Ses dalgası çubuklarının yükselip alçalması */
+@keyframes wave {
+  0%, 100% { transform: scaleY(0.3); }
+  50%      { transform: scaleY(1); }
+}
+/* Modal açılış: belirme + hafif büyüme */
+@keyframes modalOpen {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Kartların sırayla (stagger) belirmesi — 10 kart için gecikmeler */
+.cards-grid > .card:nth-child(1)  { animation-delay: 0.05s; }
+.cards-grid > .card:nth-child(2)  { animation-delay: 0.10s; }
+.cards-grid > .card:nth-child(3)  { animation-delay: 0.15s; }
+.cards-grid > .card:nth-child(4)  { animation-delay: 0.20s; }
+.cards-grid > .card:nth-child(5)  { animation-delay: 0.25s; }
+.cards-grid > .card:nth-child(6)  { animation-delay: 0.30s; }
+.cards-grid > .card:nth-child(7)  { animation-delay: 0.35s; }
+.cards-grid > .card:nth-child(8)  { animation-delay: 0.40s; }
+.cards-grid > .card:nth-child(9)  { animation-delay: 0.45s; }
+.cards-grid > .card:nth-child(10) { animation-delay: 0.50s; }
+
+/* ============================================================= */
+/*  === RESPONSIVE (MEDIA QUERY) ===                            */
+/* ============================================================= */
+
+/* TABLET: 769px+ → 2 sütun. Tek hücre kartlar; sadece GitHub tam genişlik. */
+@media (min-width: 769px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .card--github { grid-column: span 2; }
+}
+
+/* MASAÜSTÜ: 1025px+ → 3 sütunlu BENTO GRID.
+   Kartların span değerleri, ızgarayı satır satır boşluksuz doldurur:
+   [About(1) Focus(2)] [Music(1) Books(1) Training(1)]
+   [Projects(3)] [Highlights(1) Tech(2)] [GitHub(3)] */
+@media (min-width: 1025px) {
+  .cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .card--focus    { grid-column: span 2; }
+  .card--projects { grid-column: span 3; }
+  .card--tech     { grid-column: span 2; }
+  .card--github   { grid-column: span 3; }
+}
+
+/* MOBİL: 768px ve altı → fontları/boşlukları biraz daralt */
+@media (max-width: 768px) {
+  .page {
+    padding: 2rem 1.1rem 1.5rem;
+  }
+  .header {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  .header__meta {
+    justify-content: center;
+  }
+  .card {
+    padding: 1.3rem;
+  }
+}
+
+/* ERİŞİLEBİLİRLİK: Hareketi azaltmayı tercih edenler için animasyonları kapat */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+  .card {
+    opacity: 1 !important; /* animasyon kapalıyken kartlar görünür kalsın */
+  }
+}
