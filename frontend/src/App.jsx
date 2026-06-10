@@ -40,11 +40,30 @@ function App() {
 
     const gozlemci = new IntersectionObserver(
       (girisler) => {
-        girisler.forEach((giris) => {
-          if (giris.isIntersecting) {
-            giris.target.classList.add('is-visible')
-            gozlemci.unobserve(giris.target) // bir kez göründü, takibi bırak
-          }
+        // Bu turda ekrana giren kartları DOM sırasına göre topla.
+        // Aynı anda görünenlere artan gecikme verince "stagger" (sırayla
+        // belirme) efekti oluşur: ilk açılışta üst kartlar art arda akar.
+        // Gecikme yalnızca o turdaki kartlara bindiği için aşağıdaki kartlar
+        // scroll'da kendi küçük gruplarında belirir — sonsuz gecikme olmaz.
+        const gorunenler = girisler
+          .filter((g) => g.isIntersecting)
+          .sort((a, b) =>
+            a.target.compareDocumentPosition(b.target) &
+            Node.DOCUMENT_POSITION_FOLLOWING
+              ? -1
+              : 1,
+          )
+
+        gorunenler.forEach((giris, i) => {
+          const kart = giris.target
+          kart.style.transitionDelay = `${i * 0.08}s` // her kart 80ms sonra
+          kart.classList.add('is-visible')
+          gozlemci.unobserve(kart) // bir kez göründü, takibi bırak
+          // Belirme bittikten sonra gecikmeyi sıfırla ki hover anında tepki versin
+          // (inline transition-delay tüm geçişleri etkiler, hover'ı yavaşlatmasın).
+          setTimeout(() => {
+            kart.style.transitionDelay = ''
+          }, i * 80 + 700)
         })
       },
       { threshold: 0.15 },

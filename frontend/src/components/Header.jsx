@@ -8,9 +8,12 @@
 // =============================================================
 
 // Lucide React ikonları (sistem emojisi yerine tutarlı SVG ikonlar)
-import { UserCircle2, Sparkles, MapPin, CalendarClock } from 'lucide-react'
+import { Sparkles, MapPin, CalendarClock } from 'lucide-react'
 // Aydınlık/karanlık tema değiştirici buton
 import ThemeToggle from './ThemeToggle.jsx'
+// Profil fotoğrafı — Vite asset olarak import edilir (GitHub Pages base yolu
+// otomatik düzeltilsin diye <img src="/..."> yerine modül importu tercih edildi).
+import profilFoto from '../assets/profile.jpg'
 
 function Header() {
   // --- Son güncelleme tarihi ---
@@ -29,12 +32,15 @@ function Header() {
       <ThemeToggle />
 
       {/* === SOL: Profil fotoğrafı === */}
-      {/* .profile-photo sınıfı, ileride gerçek <img> ile kolay değişim için ayrıldı. */}
       <div className="profile-photo">
-        {/* TODO: Profil fotoğrafı eklenecek — bu placeholder'ı
-            <img src="/profil.jpg" alt="Ahmet Aksoy" className="profile-photo__img" />
-            ile değiştir. */}
-        <UserCircle2 size={80} aria-hidden="true" />
+        <img
+          src={profilFoto}
+          alt="Ahmet Aksoy'un profil fotoğrafı"
+          className="profile-photo__img"
+          width="104"
+          height="104"
+          loading="eager"
+        />
       </div>
 
       {/* === SAĞ: İsim + bio + meta bilgiler === */}
