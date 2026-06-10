@@ -60,15 +60,15 @@ function ProjectModal({ proje, onClose }) {
   }, [proje, onClose, onceki, sonraki, gorselSayisi])
 
   // --- Otomatik geçiş (carousel) ---
-  // Her 4 sn'de bir sonraki görsele geçer ve sona gelince başa döner.
+  // Her 3 sn'de bir sonraki görsele geçer ve sona gelince başa döner.
   // aktifGorsel bağımlılıkta olduğu için elle (ok/thumbnail/klavye) geçiş
-  // yapılınca zamanlayıcı sıfırlanır → kullanıcı müdahalesi sonrası 4 sn
+  // yapılınca zamanlayıcı sıfırlanır → kullanıcı müdahalesi sonrası 3 sn
   // bekleyip otomatik akış kaldığı yerden sürer. Fareyle üzerine gelince
   // (durdur) duraklar; hareketi azaltma tercihinde hiç çalışmaz.
   useEffect(() => {
     if (!proje || gorselSayisi <= 1 || durdur) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const zamanlayici = setInterval(sonraki, 4000)
+    const zamanlayici = setInterval(sonraki, 3000)
     return () => clearInterval(zamanlayici)
   }, [proje, gorselSayisi, durdur, aktifGorsel, sonraki])
 

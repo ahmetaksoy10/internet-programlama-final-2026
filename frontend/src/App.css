@@ -678,29 +678,30 @@ button:focus-visible,
 /* ============================================================= */
 /*  === MÜZİK KARTI ===                                          */
 /* ============================================================= */
-/* Geniş ekranda açıklama + oynatıcı yan yana; darda alt alta sarar. */
+/* Kart artık 2/3 genişlikte (daha dar) → açıklama üstte, oynatıcı altta yığılır. */
 .music-embed {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1.25rem;
+  flex-direction: column;
+  gap: 1rem;
 }
 .music-embed__caption {
-  flex: 1 1 220px;
-  min-width: 200px;
   color: var(--text-secondary);
   line-height: 1.7;
 }
-/* Apple Music oynatıcısı: en fazla 660px, alanı kalınca esner */
+/* Apple Music oynatıcısı: kart genişliğini tam doldurur */
 .music-embed__frame {
-  flex: 1 1 420px;
   width: 100%;
-  max-width: 660px;
+  max-width: 100%;
   height: 450px;
   border: none;
   border-radius: 14px;
   overflow: hidden;
   background: transparent;
+}
+/* Karanlık temada iframe'e renk şeması öner — Apple embed destekliyorsa
+   içerik de koyulaşır (theme=dark URL parametresine ek yedek). */
+:root[data-theme='dark'] .music-embed__frame {
+  color-scheme: dark;
 }
 
 /* ============================================================= */
@@ -1490,18 +1491,19 @@ button:focus-visible,
 
 /* MASAÜSTÜ: 1025px+ → 3 sütunlu BENTO GRID.
    Kartların span değerleri, ızgarayı satır satır boşluksuz doldurur:
-   [About(1) Focus(2)] [Music(3)]
-   [Books(1) Battery(1) Highlights(1)] [Projects(3)]
+   [About(1) Focus(2)] [Music(2) Books(1)]
+   [Battery(1) Highlights(2)] [Projects(3)]
    [Tech(2) Backlog(1)] [GitHub(3)] */
 @media (min-width: 1025px) {
   .cards-grid {
     grid-template-columns: repeat(3, 1fr);
   }
-  .card--focus    { grid-column: span 2; }
-  .card--music    { grid-column: span 3; }
-  .card--projects { grid-column: span 3; }
-  .card--tech     { grid-column: span 2; }
-  .card--github   { grid-column: span 3; }
+  .card--focus      { grid-column: span 2; }
+  .card--music      { grid-column: span 2; } /* 2/3 — yanında Books(1) */
+  .card--highlights { grid-column: span 2; } /* Battery(1) + Highlights(2) satırı doldurur */
+  .card--projects   { grid-column: span 3; }
+  .card--tech       { grid-column: span 2; }
+  .card--github     { grid-column: span 3; }
 }
 
 /* MOBİL: 768px ve altı → fontları/boşlukları biraz daralt */
