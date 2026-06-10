@@ -30,16 +30,46 @@ import {
 } from 'lucide-react'
 // Sayıları 0'dan hedefe artırarak gösteren bileşen
 import CountUp from './CountUp.jsx'
+// Repoların dil dağılımını SVG donut olarak çizen bileşen
+import LanguageDonut from './LanguageDonut.jsx'
 
 // Verisini çekeceğimiz GitHub kullanıcı adı (tek yerde tanımlı, kolay değişir).
 const GITHUB_KULLANICI = 'ahmetaksoy10'
 // Kaç adet commit göstereceğimiz.
 const COMMIT_SAYISI = 5
+// Donut'ta ayrı ayrı gösterilecek en fazla dil sayısı (gerisi "Diğer").
+const DIL_LIMITI = 5
+
+// Dillerin GitHub'daki resmi renkleri (donut + legend için).
+// Listede olmayan diller nötr griyle gösterilir.
+const DIL_RENK = {
+  Swift: '#f05138',
+  Python: '#3572A5',
+  JavaScript: '#f1e05a',
+  TypeScript: '#3178c6',
+  'C++': '#f34b7d',
+  C: '#555555',
+  'C#': '#178600',
+  Java: '#b07219',
+  Kotlin: '#A97BFF',
+  Dart: '#00B4AB',
+  Go: '#00ADD8',
+  Ruby: '#701516',
+  PHP: '#4F5D95',
+  HTML: '#e34c26',
+  CSS: '#563d7c',
+  Vue: '#41b883',
+  Shell: '#89e051',
+  'Jupyter Notebook': '#DA5B0B',
+}
+const VARSAYILAN_RENK = '#9ca3af' // bilinmeyen diller için nötr gri
+const DIGER_RENK = '#b0b3bd' // "Diğer" dilimi için
 
 function GitHubCard() {
   // --- STATE TANIMLARI ---
   const [commitler, setCommitler] = useState([]) // işlenmiş commit listesi
   const [istatistik, setIstatistik] = useState(null) // {repo, takipci, takip}
+  const [diller, setDiller] = useState([]) // dil dağılımı (donut için)
   const [cekmeZamani, setCekmeZamani] = useState(null) // verinin çekildiği an
   const [yukleniyor, setYukleniyor] = useState(true)
   const [hata, setHata] = useState(null)
@@ -49,11 +79,14 @@ function GitHubCard() {
   useEffect(() => {
     async function veriGetir() {
       try {
-        // === 1. AŞAMA: Profil + olayları PARALEL çek ===
-        // Promise.all, iki isteği aynı anda başlatır; ikisi de bitince devam eder.
-        const [profilYaniti, olayYaniti] = await Promise.all([
+        // === 1. AŞAMA: Profil + olaylar + repolar PARALEL çek ===
+        // Promise.all üç isteği aynı anda başlatır; hepsi bitince devam eder.
+        const [profilYaniti, olayYaniti, repoYaniti] = await Promise.all([
           fetch(`https://api.github.com/users/${GITHUB_KULLANICI}`),
           fetch(`https://api.github.com/users/${GITHUB_KULLANICI}/events`),
+          fetch(
+            `https://api.github.com/users/${GITHUB_KULLANICI}/repos?per_page=100&sort=pushed`,
+          ),
         ])
         if (!olayYaniti.ok) {
           throw new Error('GitHub olayları alınamadı: ' + olayYaniti.status)
@@ -67,6 +100,45 @@ function GitHubCard() {
           takipci: profil.followers,
           takip: profil.following,
         })
+
+        // --- Dil dağılımını hesapla (repo isteği başarılıysa; başarısızsa
+        //     kart çökmeden donut'suz devam eder) ---
+        if (repoYaniti.ok) {
+          const repolar = await repoYaniti.json()
+          // Her reponun ana dilini say (fork'lar başkasının dilini taşır → atla)
+          const sayac = {}
+          for (const r of repolar) {
+            if (r.fork || !r.language) continue
+            sayac[r.language] = (sayac[r.language] || 0) + 1
+          }
+          const toplam = Object.values(sayac).reduce((a, b) => a + b, 0)
+          if (toplam > 0) {
+            // En çok kullanılandan aza sırala
+            const sirali = Object.entries(sayac).sort((a, b) => b[1] - a[1])
+            const ilkler = sirali.slice(0, DIL_LIMITI)
+            // Limitin dışındakileri tek "Diğer" diliminde topla
+            const digerToplam = sirali
+              .slice(DIL_LIMITI)
+              .reduce((a, [, v]) => a + v, 0)
+
+            const liste = ilkler.map(([ad, deger]) => ({
+              ad,
+              deger,
+              renk: DIL_RENK[ad] || VARSAYILAN_RENK,
+            }))
+            if (digerToplam > 0) {
+              liste.push({ ad: 'Diğer', deger: digerToplam, renk: DIGER_RENK })
+            }
+            // Oran (yay için, 0-1) ve yüzde (etiket için) ekle
+            setDiller(
+              liste.map((d) => ({
+                ...d,
+                oran: d.deger / toplam,
+                yuzde: Math.round((d.deger / toplam) * 100),
+              })),
+            )
+          }
+        }
 
         // Sadece "PushEvent" türündekileri süzüp en yeni 5 tanesini alıyoruz.
         const pushOlaylari = olaylar
@@ -176,6 +248,14 @@ function GitHubCard() {
           <span className="gh-stat">
             <strong><CountUp value={istatistik.takip} /></strong> takip
           </span>
+        </div>
+      )}
+
+      {/* Dil dağılımı donut'u (repolardan hesaplandıysa göster) */}
+      {diller.length > 0 && (
+        <div className="gh-langs-wrap">
+          <p className="gh-langs-baslik">En çok kullandığım diller</p>
+          <LanguageDonut diller={diller} />
         </div>
       )}
 

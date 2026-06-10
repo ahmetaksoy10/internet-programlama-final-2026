@@ -13,6 +13,7 @@
 import { useEffect, useRef } from 'react'
 import AuroraBackground from './components/AuroraBackground.jsx'
 import FloatingParticles from './components/FloatingParticles.jsx'
+import CursorGlow from './components/CursorGlow.jsx'
 import Header from './components/Header.jsx'
 import AboutCard from './components/AboutCard.jsx'
 import FocusCard from './components/FocusCard.jsx'
@@ -77,6 +78,8 @@ function App() {
       {/* Arka plan katmanları (içeriğin ardında, fixed, dekoratif) */}
       <AuroraBackground />
       <FloatingParticles />
+      {/* Fareyi takip eden ışık hâlesi — kolayca kaldırılabilir (bkz. CursorGlow.jsx) */}
+      <CursorGlow />
 
       <div className="page">
         <Header />

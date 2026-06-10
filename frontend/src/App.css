@@ -1575,3 +1575,176 @@ button:focus-visible,
   opacity: 0.4;
 }
 
+/* ============================================================= */
+/*  === DAKTİLO (TYPEWRITER) EFEKTİ ===                          */
+/* ============================================================= */
+/* Yazarken yanıp sönen imleç (ince dikey çubuk) */
+.typewriter__caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: var(--accent-focus);
+  animation: caretBlink 0.9s step-end infinite;
+}
+@keyframes caretBlink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+/* Bio'nun kalan kısmı: daktilo bitince yumuşakça belirir */
+.header__bio-rest {
+  opacity: 0;
+  transition: opacity 0.55s ease;
+}
+.header__bio-rest.is-shown {
+  opacity: 1;
+}
+
+/* ============================================================= */
+/*  === E-POSTA KOPYALA BUTONU + TOAST BİLDİRİMİ ===             */
+/* ============================================================= */
+/* Footer'daki <button>, <a> bağlantılarıyla aynı görünsün diye reset */
+.footer__link--btn {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* Ekranın altında beliren kısa bildirim */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  max-width: calc(100vw - 32px);
+  padding: 0.65rem 1.1rem;
+  border-radius: 999px;
+  background: var(--card-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.85rem;
+  font-weight: 600;
+  animation: toastIn 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.toast strong {
+  color: var(--accent-focus);
+  font-weight: 700;
+}
+.toast__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent-battery); /* yeşil onay rozeti */
+  color: #fff;
+  flex-shrink: 0;
+}
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* ============================================================= */
+/*  === GITHUB DİL DAĞILIMI (DONUT) ===                          */
+/* ============================================================= */
+.gh-langs-wrap {
+  margin-bottom: 1rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid var(--card-border);
+}
+.gh-langs-baslik {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+.gh-langs {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  flex-wrap: wrap;
+}
+.gh-donut {
+  flex-shrink: 0;
+}
+.gh-lang-legend {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.3rem;
+  align-content: center;
+}
+/* Her dil: "● Swift %57" biçiminde derli toplu bir öğe */
+.gh-lang-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+}
+.gh-lang-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.gh-lang-ad {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+.gh-lang-yuzde {
+  color: var(--text-muted);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================= */
+/*  === FARE İZİ / IŞIK HÂLESİ (CURSOR GLOW) ===                 */
+/* ============================================================= */
+/* Arka plan katmanında (z-index 0): camsı kartlar bunu blur'layıp
+   yakalar, böylece cam yüzeyler ışığa tepki veriyormuş gibi görünür. */
+.cursor-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 460px;
+  height: 460px;
+  margin: -230px 0 0 -230px; /* hâlenin merkezini imlece hizala */
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  will-change: transform;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--accent-focus) 30%, transparent) 0%,
+    color-mix(in srgb, var(--accent-about) 16%, transparent) 38%,
+    transparent 68%
+  );
+}
+:root[data-theme='dark'] .cursor-glow {
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--accent-focus) 40%, transparent) 0%,
+    color-mix(in srgb, var(--accent-about) 26%, transparent) 40%,
+    transparent 70%
+  );
+}

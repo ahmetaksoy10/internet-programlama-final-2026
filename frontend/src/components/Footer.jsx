@@ -6,13 +6,16 @@
 //  (İletişim bilgileri eski ContactCard'dan buraya taşındı.)
 // =============================================================
 
-import { Github, Linkedin, Mail } from 'lucide-react'
+import { Github, Linkedin } from 'lucide-react'
 // Ziyaretçi etkileşimi: beğeni (alkış) butonu
 import ClapButton from './ClapButton.jsx'
+// E-postayı panoya kopyalayıp "Kopyalandı" bildirimi gösteren buton
+import CopyEmailButton from './CopyEmailButton.jsx'
 
 // --- Footer bağlantıları ---
 // Her bağlantı: ikon, görünen metin ve hedef adres (href).
-// TODO: E-posta ve LinkedIn bağlantılarını gerçek bilgilerle güncelle.
+// (E-posta artık ayrı bir "kopyala" butonu olduğu için bu listede değil.)
+// TODO: LinkedIn bağlantısını gerçek profille güncelle.
 const baglantilar = [
   {
     icon: Github,
@@ -25,12 +28,6 @@ const baglantilar = [
     metin: 'LinkedIn',
     href: 'https://www.linkedin.com/',
     label: 'LinkedIn profilim',
-  },
-  {
-    icon: Mail,
-    metin: 'E-posta',
-    href: 'mailto:placeholder@email.com',
-    label: 'E-posta gönder',
   },
 ]
 
@@ -66,6 +63,8 @@ function Footer() {
             </a>
           )
         })}
+        {/* E-posta: tıklayınca adresi panoya kopyalar + toast gösterir */}
+        <CopyEmailButton />
       </div>
     </footer>
   )
