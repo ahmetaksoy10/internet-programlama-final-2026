@@ -25,10 +25,13 @@ const DURUM_RENK = {
 
 function ProjectModal({ proje, onClose }) {
   const [aktifGorsel, setAktifGorsel] = useState(0)
+  // Otomatik geçiş, fareyle üzerine gelince duraklasın diye bir bayrak
+  const [durdur, setDurdur] = useState(false)
 
-  // Farklı bir proje açılınca galeriyi sıfırla
+  // Farklı bir proje açılınca galeriyi başa sar ve duraklatmayı sıfırla
   useEffect(() => {
     setAktifGorsel(0)
+    setDurdur(false)
   }, [proje?.ad])
 
   const gorselSayisi = proje?.gorseller?.length ?? 0
@@ -56,6 +59,19 @@ function ProjectModal({ proje, onClose }) {
     }
   }, [proje, onClose, onceki, sonraki, gorselSayisi])
 
+  // --- Otomatik geçiş (carousel) ---
+  // Her 4 sn'de bir sonraki görsele geçer ve sona gelince başa döner.
+  // aktifGorsel bağımlılıkta olduğu için elle (ok/thumbnail/klavye) geçiş
+  // yapılınca zamanlayıcı sıfırlanır → kullanıcı müdahalesi sonrası 4 sn
+  // bekleyip otomatik akış kaldığı yerden sürer. Fareyle üzerine gelince
+  // (durdur) duraklar; hareketi azaltma tercihinde hiç çalışmaz.
+  useEffect(() => {
+    if (!proje || gorselSayisi <= 1 || durdur) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const zamanlayici = setInterval(sonraki, 4000)
+    return () => clearInterval(zamanlayici)
+  }, [proje, gorselSayisi, durdur, aktifGorsel, sonraki])
+
   if (!proje) return null
 
   const Ikon = proje.icon
@@ -82,8 +98,12 @@ function ProjectModal({ proje, onClose }) {
         {/* ── GÖRSEL GALERİSİ ── */}
         {gorselSayisi > 0 && (
           <div className="modal__gallery">
-            {/* Ana görsel */}
-            <div className="modal__gallery-main">
+            {/* Ana görsel — fareyle üzerine gelince otomatik geçiş duraklar */}
+            <div
+              className="modal__gallery-main"
+              onMouseEnter={() => setDurdur(true)}
+              onMouseLeave={() => setDurdur(false)}
+            >
               <img
                 key={aktifGorsel}
                 src={proje.gorseller[aktifGorsel].src}

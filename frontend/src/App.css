@@ -678,43 +678,29 @@ button:focus-visible,
 /* ============================================================= */
 /*  === MÜZİK KARTI ===                                          */
 /* ============================================================= */
-.music-row {
+/* Geniş ekranda açıklama + oynatıcı yan yana; darda alt alta sarar. */
+.music-embed {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 1rem;
+  gap: 1.25rem;
 }
-.music-cover {
-  flex-shrink: 0;
-  width: 72px;
-  height: 72px;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  background: linear-gradient(135deg, var(--card-accent), #ff9ff3);
-  box-shadow: var(--shadow-sm);
-}
-.music-info__title {
-  font-weight: 700;
-  color: var(--text-primary);
-}
-.music-info__artist {
-  font-size: 0.88rem;
+.music-embed__caption {
+  flex: 1 1 220px;
+  min-width: 200px;
   color: var(--text-secondary);
-  margin-bottom: 0.4rem;
+  line-height: 1.7;
 }
-.music-info__link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--card-accent);
-  text-decoration: none;
-}
-.music-info__link:hover {
-  text-decoration: underline;
+/* Apple Music oynatıcısı: en fazla 660px, alanı kalınca esner */
+.music-embed__frame {
+  flex: 1 1 420px;
+  width: 100%;
+  max-width: 660px;
+  height: 450px;
+  border: none;
+  border-radius: 14px;
+  overflow: hidden;
+  background: transparent;
 }
 
 /* ============================================================= */
@@ -771,32 +757,6 @@ button:focus-visible,
   flex-shrink: 0;
   margin-top: 0.1rem; /* ikon ilk satırla hizalı dursun */
 }
-
-/* ============================================================= */
-/*  === MÜZİK — "şu an çalıyor" ses dalgası (equalizer) ===      */
-/* ============================================================= */
-.music-info__titlerow {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.sound-wave {
-  display: flex;
-  align-items: flex-end;
-  gap: 3px;
-  height: 18px;
-}
-.sound-wave .bar {
-  width: 3px;
-  background-color: var(--accent-music);
-  border-radius: 2px;
-  /* Her çubuk aynı animasyonu farklı gecikmeyle oynatır → dalga etkisi */
-  animation: wave 1s ease-in-out infinite;
-}
-.sound-wave .bar:nth-child(1) { animation-delay: 0s;    height: 60%; }
-.sound-wave .bar:nth-child(2) { animation-delay: 0.15s; height: 100%; }
-.sound-wave .bar:nth-child(3) { animation-delay: 0.3s;  height: 40%; }
-.sound-wave .bar:nth-child(4) { animation-delay: 0.45s; height: 80%; }
 
 /* ============================================================= */
 /*  === GITHUB KARTI (canlı veri) ===                            */
@@ -1488,11 +1448,6 @@ button:focus-visible,
     transform: rotate(360deg);
   }
 }
-/* Ses dalgası çubuklarının yükselip alçalması */
-@keyframes wave {
-  0%, 100% { transform: scaleY(0.3); }
-  50%      { transform: scaleY(1); }
-}
 /* Canlı indikatör nokta: yanıp sönme */
 @keyframes pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
@@ -1523,25 +1478,30 @@ button:focus-visible,
 /*  === RESPONSIVE (MEDIA QUERY) ===                            */
 /* ============================================================= */
 
-/* TABLET: 769px+ → 2 sütun. Tüm kartlar tek hücre (10 kart = temiz 5×2). */
+/* TABLET: 769px+ → 2 sütun. Müzik (Apple Music embed) ve GitHub tam genişlik;
+   geri kalan kartlar ikişerli dizilir (12 hücre = temiz 6 satır, boşluksuz). */
 @media (min-width: 769px) {
   .cards-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+  .card--music  { grid-column: 1 / -1; }
+  .card--github { grid-column: 1 / -1; }
 }
 
 /* MASAÜSTÜ: 1025px+ → 3 sütunlu BENTO GRID.
    Kartların span değerleri, ızgarayı satır satır boşluksuz doldurur:
-   [About(1) Focus(2)] [Music(1) Books(1) Battery(1)]
-   [Projects(3)] [Highlights(1) Tech(2)] [Backlog(1) GitHub(2)] */
+   [About(1) Focus(2)] [Music(3)]
+   [Books(1) Battery(1) Highlights(1)] [Projects(3)]
+   [Tech(2) Backlog(1)] [GitHub(3)] */
 @media (min-width: 1025px) {
   .cards-grid {
     grid-template-columns: repeat(3, 1fr);
   }
   .card--focus    { grid-column: span 2; }
+  .card--music    { grid-column: span 3; }
   .card--projects { grid-column: span 3; }
   .card--tech     { grid-column: span 2; }
-  .card--github   { grid-column: span 2; }
+  .card--github   { grid-column: span 3; }
 }
 
 /* MOBİL: 768px ve altı → fontları/boşlukları biraz daralt */

@@ -5,8 +5,9 @@
 //  belirme (reveal) animasyonunu yönetmek.
 //
 //  BENTO GRID tiling (masaüstü, 3 sütun, boşluksuz):
-//   [About(1) Focus(2)] [Music(1) Books(1) Battery(1)] [Projects(3)]
-//   [Highlights(1) Tech(2)] [Backlog(1) GitHub(2)]
+//   [About(1) Focus(2)] [Music(3) — Apple Music embed]
+//   [Books(1) Battery(1) Highlights(1)] [Projects(3)]
+//   [Tech(2) Backlog(1)] [GitHub(3)]
 // =============================================================
 
 import { useEffect, useRef } from 'react'
@@ -67,8 +68,8 @@ function App() {
           <MusicCard />
           <BooksCard />
           <BatteryCard />
-          <ProjectsCard />
           <HighlightsCard />
+          <ProjectsCard />
           <TechStackCard />
           <BacklogCard />
           <GitHubCard />

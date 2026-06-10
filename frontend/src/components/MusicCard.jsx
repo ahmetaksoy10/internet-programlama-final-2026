@@ -1,11 +1,13 @@
 // =============================================================
 //  MusicCard.jsx — "Şu An Kulaklıkta" (Music) kartı
 // -------------------------------------------------------------
-//  Görevi: Şu sıralar dinlediğim müzik/playlist bilgisini göstermek.
-//  Tamamen statik veri (API yok); içerik elle güncellenir.
+//  Görevi: Şu sıralar dinlediğim çalma listesini Apple Music'in
+//  resmi gömülü (embed) oynatıcısıyla CANLI göstermek.
+//  Oynatıcı doğrudan Apple Music'ten gelir; ziyaretçi parçaları
+//  buradan dinleyebilir.
 // =============================================================
 
-import { Headphones, Disc3, ExternalLink } from 'lucide-react'
+import { Headphones } from 'lucide-react'
 
 function MusicCard() {
   return (
@@ -17,43 +19,25 @@ function MusicCard() {
         <h2 className="card__title">Şu An Kulaklıkta</h2>
       </div>
 
-      {/* Albüm kapağı placeholder'ı + bilgi yan yana */}
-      <div className="music-row">
-        {/* TODO: Albüm kapağı görseli eklenecek —
-            bu kutuyu <img src="/album.jpg" alt="Albüm kapağı" /> ile değiştir. */}
-        <div className="music-cover" aria-hidden="true">
-          <Disc3 size={32} />
-        </div>
+      {/* Geniş ekranda: açıklama solda, oynatıcı sağda.
+          Dar ekranda: alt alta yığılır (flex-wrap). */}
+      <div className="music-embed">
+        <p className="music-embed__caption">
+          Bu sıralar kod yazarken dinlediğim Türkçe çalma listesi. Apple Music'ten
+          canlı gömülü — istediğin parçayı doğrudan buradan çalabilirsin. 🎧
+        </p>
 
-        <div className="music-info">
-          {/* Başlık satırı: playlist adı + "şu an çalıyor" ses dalgası animasyonu */}
-          <div className="music-info__titlerow">
-            {/* TODO: Playlist/sanatçı bilgisini güncelle */}
-            <p className="music-info__title">Chill Coding Mix</p>
-            {/* Ses dalgası (equalizer): 4 çubuğun sürekli yükselip alçalmasıyla
-                "şu an müzik çalıyor" hissi verir. Animasyon saf CSS'tir. */}
-            <span className="sound-wave" aria-hidden="true">
-              <span className="bar" />
-              <span className="bar" />
-              <span className="bar" />
-              <span className="bar" />
-            </span>
-          </div>
-          <p className="music-info__artist">
-            Lofi Beats · Tycho · Bonobo
-          </p>
-          {/* Spotify bağlantısı (placeholder link) */}
-          <a
-            className="music-info__link"
-            href="https://open.spotify.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Spotify'da aç"
-          >
-            <ExternalLink size={14} aria-hidden="true" />
-            Spotify'da aç
-          </a>
-        </div>
+        {/* Apple Music resmi embed oynatıcısı (sağlanan iframe, JSX'e uyarlandı) */}
+        <iframe
+          title="Apple Music — Türkçe çalma listesi"
+          className="music-embed__frame"
+          allow="autoplay *; encrypted-media *;"
+          frameBorder="0"
+          height="450"
+          loading="lazy"
+          sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"
+          src="https://embed.music.apple.com/tr/playlist/t%C3%BCrk%C3%A7e/pl.u-PDb4034Feq4lZly?l=tr"
+        />
       </div>
     </article>
   )
