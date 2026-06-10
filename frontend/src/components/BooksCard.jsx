@@ -1,13 +1,29 @@
 // =============================================================
 //  BooksCard.jsx — "Şu An Okuyorum" (Books) kartı
 // -------------------------------------------------------------
-//  Görevi: Şu anda okuduğum kitabı; kapak (placeholder), ad, yazar
-//  ve okuma ilerlemesi (progress bar) ile göstermek. Statik veridir.
+//  Görevi: Şu anda okuduğum kitabı; gerçek kapak görseli, ad, yazar,
+//  tür etiketleri, kısa tanıtım ve okuma ilerlemesi ile göstermek.
 // =============================================================
 
-import { BookOpen, Book } from 'lucide-react'
+import { BookOpen, Tv } from 'lucide-react'
 // İlerleme yüzdesini 0'dan hedefe sayarak gösteren bileşen
 import CountUp from './CountUp.jsx'
+// Kitap kapağı — Vite asset importu (build'de hash'lenir)
+import siloKapak from '../assets/silo-kapak.jpg'
+
+// --- Kitap verisi ---
+// Kitap bitince/değişince yalnızca bu nesneyi ve yüzdeyi güncelle.
+const KITAP = {
+  ad: 'Silo',
+  seri: 'Wool Serisi · 1. Kitap',
+  yazar: 'Hugh Howey',
+  turler: ['Bilim Kurgu', 'Distopya', 'Postapokaliptik'],
+  ozet:
+    'Dışarısı zehirli, gökyüzü yalnızca dev ekranlardan izlenebilen bir dünyada insanlığın son kalıntısı, yüzlerce kat derinliğindeki bir yeraltı silosunda yaşıyor. Dışarı çıkmak ölüm; dışarıyı merak etmekse silodaki en büyük yasak.',
+  notlar:
+    'Howey’nin önce internette bölüm bölüm yayımlayıp fenomene dönüştürdüğü seri — kapalı bir toplumun kurallarını sorgulamanın bedelini, mühendis Juliette’in gözünden anlatıyor.',
+  uyarlama: 'Apple TV+’taki "Silo" dizisinin kaynak kitabı',
+}
 
 // Okuma ilerlemesi yüzdesi (ilerleme çubuğunun genişliği için).
 const OKUMA_YUZDE = 40
@@ -25,16 +41,22 @@ function BooksCard() {
       </div>
 
       <div className="book-row">
-        {/* Kitap kapağı placeholder'ı.
-            TODO: Gerçek kapak görseli → <img src="/kitap.jpg" alt="Kitap kapağı" /> */}
-        <div className="book-cover" aria-hidden="true">
-          <Book size={28} />
+        {/* Gerçek kitap kapağı */}
+        <div className="book-cover">
+          <img
+            src={siloKapak}
+            alt={`${KITAP.ad} kitabının kapağı`}
+            className="book-cover__img"
+            width="76"
+            height="112"
+            loading="lazy"
+          />
         </div>
 
         <div className="book-info">
-          {/* TODO: Kitap adı ve yazarı güncellenecek */}
-          <p className="book-info__title">Kitap Adı Buraya</p>
-          <p className="book-info__author">Yazar Adı</p>
+          <p className="book-info__title">{KITAP.ad}</p>
+          <p className="book-info__series">{KITAP.seri}</p>
+          <p className="book-info__author">{KITAP.yazar}</p>
 
           {/* Okuma ilerleme çubuğu */}
           <div className="progress">
@@ -56,6 +78,25 @@ function BooksCard() {
           </div>
         </div>
       </div>
+
+      {/* Tür etiketleri (projelerdeki .tag ailesiyle aynı görsel dil) */}
+      <div className="tag-row book-tags">
+        {KITAP.turler.map((tur) => (
+          <span key={tur} className="tag">
+            {tur}
+          </span>
+        ))}
+      </div>
+
+      {/* Merak uyandıran özet + serinin kısa hikâyesi */}
+      <p className="book-blurb">{KITAP.ozet}</p>
+      <p className="book-blurb">{KITAP.notlar}</p>
+
+      {/* Dizi uyarlaması notu: küçük, ayrışan bir dipnot satırı */}
+      <p className="book-adaptation">
+        <Tv size={14} aria-hidden="true" />
+        <span>{KITAP.uyarlama}</span>
+      </p>
     </article>
   )
 }

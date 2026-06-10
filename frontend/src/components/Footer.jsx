@@ -26,7 +26,7 @@ const baglantilar = [
   {
     icon: Linkedin,
     metin: 'LinkedIn',
-    href: 'https://www.linkedin.com/',
+    href: 'https://www.linkedin.com/in/ahmet-aksoy10',
     label: 'LinkedIn profilim',
   },
 ]

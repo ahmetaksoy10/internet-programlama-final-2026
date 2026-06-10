@@ -369,6 +369,46 @@ button:focus-visible,
   color: transparent; /* bg-clip desteklemeyen tarayıcıda da kaza olmaz */
 }
 
+/* "Staja açığım" rozeti: yeşil radar noktası + kısa etiket.
+   Meta pill satırında yaşar — aynı boy ve ritimde, ama yeşil
+   zemin/tonuyla satırın içinden net biçimde ayrışan işe alım sinyali. */
+.avail-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, #00b894 11%, var(--tint-base));
+  border: 1px solid color-mix(in srgb, #00b894 32%, transparent);
+  box-shadow: var(--shadow-sm);
+  color: color-mix(in srgb, #00b894 78%, var(--text-primary));
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+/* Radar noktası: sabit yeşil çekirdek + dışa doğru genişleyip sönen halka */
+.avail-dot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00b894;
+  flex-shrink: 0;
+}
+.avail-dot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #00b894;
+  animation: availPing 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+@keyframes availPing {
+  0%   { transform: scale(1);   opacity: 0.65; }
+  100% { transform: scale(2.7); opacity: 0; }
+}
+
 .header__bio {
   margin: 0.35rem 0 1rem;
   color: var(--text-secondary);
@@ -815,19 +855,77 @@ button:focus-visible,
   font-weight: 700;
   margin-bottom: 0.75rem;
 }
-/* "Fotoğraflar yakında" notu (boş placeholder kutuları yerine sade bir satır) */
-.photos-soon {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-top: 0.85rem;
-  padding: 0.45rem 0.8rem;
+/* --- FOTOĞRAF KOLAJI (Roma) ---
+   4 eşit kare; her biri tıklanabilir buton → lightbox açar.
+   Son karede yarı saydam "+N" rozeti kalan fotoğraf sayısını söyler. */
+.foto-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.55rem;
+  margin-top: 0.95rem;
+}
+.foto-grid__item {
+  position: relative;
+  aspect-ratio: 1; /* her kare tam kare */
+  padding: 0;
+  border: none;
   border-radius: var(--radius-sm);
-  border: 1px dashed color-mix(in srgb, var(--card-accent) 35%, var(--tint-base));
-  background: color-mix(in srgb, var(--card-accent) 6%, var(--tint-base));
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--bg-secondary);
+}
+.foto-grid__item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* Hover: fotoğraf içeriden hafifçe büyür (çerçeve sabit kalır) */
+.foto-grid__item:hover img {
+  transform: scale(1.08);
+}
+/* "+N" rozeti: son karenin üzerine koyu tül + sayı */
+.foto-grid__more {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  background: rgba(15, 18, 25, 0.52);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  transition: background 0.25s ease;
+}
+.foto-grid__item:hover .foto-grid__more {
+  background: rgba(15, 18, 25, 0.38);
+}
+
+/* --- FOTOĞRAF LIGHTBOX'I (FotoGaleriModal) ---
+   Proje modalının galeri stillerini aynen kullanır; yalnızca
+   altta ince bir konum/açıklama çubuğu eklenir. */
+.foto-modal__caption {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.85rem 1.4rem 1rem;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+}
+.foto-modal__caption strong {
+  color: var(--text-primary);
+}
+.foto-modal__alt {
   color: var(--text-muted);
-  font-size: 0.82rem;
-  font-weight: 600;
+}
+/* Açıklama çubuğundan önce ayraç noktası */
+.foto-modal__alt::before {
+  content: '·';
+  margin-right: 0.45rem;
+  color: var(--text-muted);
 }
 
 /* ============================================================= */
@@ -905,15 +1003,23 @@ button:focus-visible,
 }
 .book-cover {
   flex-shrink: 0;
-  width: 64px;
-  height: 88px;
+  width: 76px;
+  height: 112px;
   border-radius: var(--radius-sm);
+  overflow: hidden; /* kapak görseli köşelerden taşmasın */
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
   background: linear-gradient(135deg, var(--card-accent), #55efc4);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
+}
+/* Gerçek kapak görseli: kutuyu tam doldurur */
+.book-cover__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 .book-info {
   flex: 1;
@@ -923,10 +1029,44 @@ button:focus-visible,
   font-weight: 700;
   color: var(--text-primary);
 }
+/* Seri bilgisi: "Wool Serisi · 1. Kitap" — küçük, silik üst etiket */
+.book-info__series {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
 .book-info__author {
   font-size: 0.88rem;
   color: var(--text-secondary);
   margin-bottom: 0.2rem;
+}
+/* Tür etiketleri satırı (kitap satırının altında) */
+.book-tags {
+  margin-top: 0.9rem;
+}
+/* Özet paragrafları — kart metninden biraz küçük, nefes alan satır aralığı */
+.book-blurb {
+  margin-top: 0.7rem;
+  font-size: 0.86rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+/* Dizi uyarlaması dipnotu: ince üst çizgiyle ayrılan küçük satır */
+.book-adaptation {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--card-border);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.book-adaptation svg {
+  flex-shrink: 0;
+  color: var(--card-accent);
 }
 
 /* ============================================================= */

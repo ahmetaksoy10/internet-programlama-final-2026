@@ -85,6 +85,12 @@ function Header() {
             <CalendarClock size={14} aria-hidden="true" />
             Son güncelleme: {sonGuncelleme}
           </span>
+          {/* İşe alım sinyali: yeşil "radar" noktası + kısa, net etiket.
+              Pill ailesiyle aynı boy/dil — yeşil tonuyla içlerinden ayrışır. */}
+          <span className="avail-badge">
+            <span className="avail-dot" aria-hidden="true" />
+            Staja açığım · Yaz 2026
+          </span>
         </div>
       </div>
     </header>
