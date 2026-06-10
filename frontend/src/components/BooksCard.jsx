@@ -15,6 +15,8 @@ const OKUMA_YUZDE = 40
 function BooksCard() {
   return (
     <article className="card card--books">
+      {/* Ghost ikon: kartın filigran kimliği (CSS .card__ghost) */}
+      <BookOpen className="card__ghost" strokeWidth={1.5} aria-hidden="true" />
       <div className="card__head">
         <span className="card__icon" aria-hidden="true">
           <BookOpen size={20} />

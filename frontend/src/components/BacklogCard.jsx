@@ -23,6 +23,8 @@ const backlogItems = [
 function BacklogCard() {
   return (
     <article className="card card--backlog">
+      {/* Ghost ikon: kartın filigran kimliği (CSS .card__ghost) */}
+      <ListTodo className="card__ghost" strokeWidth={1.5} aria-hidden="true" />
       <div className="card__head">
         <span className="card__icon" aria-hidden="true">
           <ListTodo size={20} />

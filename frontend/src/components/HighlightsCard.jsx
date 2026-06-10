@@ -13,6 +13,8 @@ import { Plane, MapPin, Camera } from 'lucide-react'
 function HighlightsCard() {
   return (
     <article className="card card--highlights">
+      {/* Ghost ikon: kartın filigran kimliği (CSS .card__ghost) */}
+      <Plane className="card__ghost" strokeWidth={1.5} aria-hidden="true" />
       <div className="card__head">
         <span className="card__icon" aria-hidden="true">
           <Plane size={20} />

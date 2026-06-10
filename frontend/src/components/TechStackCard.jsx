@@ -29,6 +29,8 @@ const kategoriler = [
 function TechStackCard() {
   return (
     <article className="card card--tech">
+      {/* Ghost ikon: kartın filigran kimliği (CSS .card__ghost) */}
+      <Wrench className="card__ghost" strokeWidth={1.5} aria-hidden="true" />
       <div className="card__head">
         <span className="card__icon" aria-hidden="true">
           <Wrench size={20} />

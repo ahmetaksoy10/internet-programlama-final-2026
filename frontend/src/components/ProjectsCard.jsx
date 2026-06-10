@@ -113,6 +113,8 @@ function ProjectsCard() {
 
   return (
     <article className="card card--projects">
+      {/* Ghost ikon: kartın filigran kimliği (CSS .card__ghost) */}
+      <Code2 className="card__ghost" strokeWidth={1.5} aria-hidden="true" />
       <div className="card__head">
         <span className="card__icon" aria-hidden="true">
           <Code2 size={20} />

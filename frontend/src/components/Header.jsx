@@ -61,14 +61,9 @@ function Header() {
 
       {/* === SAĞ: İsim + bio + meta bilgiler === */}
       <div className="header__info">
-        {/* Küçük üst etiket ("şu an" / now page konseptini vurgular) */}
-        <span className="header__eyebrow">
-          <Sparkles size={15} aria-hidden="true" />
-          şu an · now page
-        </span>
-
+        
         {/* Sayfada yalnızca BİR adet <h1> bulunur (SEO/erişilebilirlik kuralı) */}
-        <h1 className="header__name">Ahmet Aksoy</h1>
+        <h1 className="header__name">Ahmet AKSOY</h1>
 
         {/* Kısa biyografi.
             DAKTİLO EFEKTİNİ KALDIRMAK İSTERSEN: <Typewriter .../> yerine

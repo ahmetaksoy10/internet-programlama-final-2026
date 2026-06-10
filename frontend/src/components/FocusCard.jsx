@@ -12,6 +12,8 @@ function FocusCard() {
   return (
     // .card--focus: daha geniş, daha sıcak arka planlı, vurgulu kart varyantı
     <article className="card card--focus">
+      {/* Ghost ikon: kartın filigran kimliği (CSS .card__ghost) */}
+      <Target className="card__ghost" strokeWidth={1.5} aria-hidden="true" />
       {/* "Sabitlenmiş" rozeti — bu kartın öneminin altını çizer */}
       <span className="card__pin" aria-label="Sabitlenmiş içerik">
         <Pin size={14} aria-hidden="true" />

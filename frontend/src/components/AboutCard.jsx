@@ -20,6 +20,8 @@ const maddeler = [
 function AboutCard() {
   return (
     <article className="card card--about">
+      {/* Ghost ikon: kartın filigran kimliği (CSS .card__ghost) */}
+      <UserRound className="card__ghost" strokeWidth={1.5} aria-hidden="true" />
       <div className="card__head">
         <span className="card__icon" aria-hidden="true">
           <UserRound size={20} />

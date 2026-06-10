@@ -239,14 +239,18 @@ button:focus-visible,
 }
 
 /* ============================================================= */
-/*  === HEADER (profil + bio) ===                                */
+/*  === HEADER (hero: profil + dev isim + bio) ===               */
+/*  v2 — Dikey akış: foto üstte, altında sayfanın tartışmasız    */
+/*  odağı olan büyük gradient isim, sonra bio ve meta satırı.    */
+/*  Bol nefes alanı → ilk bakışta net hiyerarşi.                 */
 /* ============================================================= */
 .header {
   position: relative; /* tema butonunu köşeye konumlandırmak için */
   display: flex;
-  align-items: center;
-  gap: 1.75rem;
-  margin-bottom: 2.25rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.4rem;
+  margin-bottom: 3rem;
   animation: fadeSlideUp 0.5s ease both;
 }
 
@@ -306,8 +310,8 @@ button:focus-visible,
 /* Profil fotoğrafı alanı */
 .profile-photo {
   position: relative; /* halkanın ::before'unun ÜZERİNDE boyansın */
-  width: 104px;
-  height: 104px;
+  width: 128px;
+  height: 128px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -343,17 +347,34 @@ button:focus-visible,
   margin-bottom: 0.35rem;
 }
 
+/* İsim: sayfanın odak noktası. Dev boyut + gradient dolgu.
+   Gradient, metnin kendisine boyanır (background-clip: text) —
+   koyu zeminden markanın mor/mercan tonlarına akan bir geçiş.
+   Tema değişkenleri sayesinde karanlıkta otomatik uyum sağlar. */
 .header__name {
-  font-size: clamp(2rem, 5vw, 2.8rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--text-primary);
+  font-size: clamp(3rem, 7.5vw, 5.4rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.04;
+  padding-bottom: 0.08em; /* g, y gibi sarkan harfler kırpılmasın */
+  background: linear-gradient(
+    94deg,
+    var(--text-primary) 25%,
+    var(--accent-about) 72%,
+    var(--accent-focus) 108%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent; /* bg-clip desteklemeyen tarayıcıda da kaza olmaz */
 }
 
 .header__bio {
-  margin: 0.5rem 0 0.9rem;
+  margin: 0.35rem 0 1rem;
   color: var(--text-secondary);
-  max-width: 620px;
+  max-width: 660px;
+  font-size: 1.08rem;
+  line-height: 1.75;
 }
 
 /* Meta satırı: konum + güncelleme tarihi pill'leri */
@@ -391,6 +412,7 @@ button:focus-visible,
 /* ============================================================= */
 .card {
   position: relative;
+  overflow: hidden; /* köşeden taşan ghost ikon zarifçe kırpılır */
   /* Camsı (buzlu cam) zemin: yarı saydam + arkasını bulanıklaştırır */
   background: var(--card-glass);
   -webkit-backdrop-filter: blur(12px) saturate(1.1);
@@ -451,6 +473,35 @@ button:focus-visible,
   .card:hover::after {
     opacity: 1;
   }
+}
+
+/* --- GHOST İKON (kart kişiliği) ---
+   Her kartın sağ alt köşesinde, kartın kendi ikonunun dev ve çok soluk
+   bir kopyası "filigran" gibi durur. Kartlara tek bakışta ayırt edici
+   bir kimlik katar; hover'da hafifçe canlanır. z-index -1: cam zeminin
+   üstünde ama içeriğin altında boyanır, metni asla rahatsız etmez. */
+.card__ghost {
+  position: absolute;
+  right: -16px;
+  bottom: -16px;
+  width: 148px;
+  height: 148px;
+  z-index: -1;
+  color: var(--card-accent, var(--accent-about));
+  opacity: 0.07;
+  transform: rotate(-10deg);
+  pointer-events: none;
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+.card:hover .card__ghost {
+  opacity: 0.13;
+  transform: rotate(-4deg) scale(1.06);
+}
+:root[data-theme='dark'] .card__ghost {
+  opacity: 0.09;
+}
+:root[data-theme='dark'] .card:hover .card__ghost {
+  opacity: 0.16;
 }
 
 /* Kart başlığı (ikon + metin) */
@@ -1653,9 +1704,10 @@ button:focus-visible,
     padding: 2rem 1.1rem 1.5rem;
   }
   .header {
-    flex-direction: column;
+    align-items: center; /* mobilde hero ortalanır */
     text-align: center;
     gap: 1rem;
+    margin-bottom: 2.25rem;
   }
   .header__meta {
     justify-content: center;
