@@ -69,7 +69,26 @@ function App() {
       { threshold: 0.15 },
     )
     kartlar.forEach((kart) => gozlemci.observe(kart))
-    return () => gozlemci.disconnect()
+
+    // --- Spotlight (ışık noktası) hover efekti ---
+    // Fare kartın üzerinde gezinirken konumunu o kartın --mx/--my CSS
+    // değişkenlerine yazarız; CSS'teki radial-gradient bu noktayı izler.
+    // Tek dinleyici grid'de (event delegation) → kart başına maliyet yok.
+    // Görünürlük tamamen CSS'te (:hover + @media (hover:hover)) yönetilir,
+    // dokunmatik cihazlarda efekt hiç çizilmez.
+    function fareIzle(e) {
+      const kart = e.target.closest('.card')
+      if (!kart) return
+      const kutu = kart.getBoundingClientRect()
+      kart.style.setProperty('--mx', `${e.clientX - kutu.left}px`)
+      kart.style.setProperty('--my', `${e.clientY - kutu.top}px`)
+    }
+    grid.addEventListener('mousemove', fareIzle)
+
+    return () => {
+      gozlemci.disconnect()
+      grid.removeEventListener('mousemove', fareIzle)
+    }
   }, [])
 
   return (

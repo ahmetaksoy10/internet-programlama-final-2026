@@ -42,16 +42,21 @@ function Header() {
       {/* Sağ üst köşede tema değiştirici (aydınlık/karanlık) */}
       <ThemeToggle />
 
-      {/* === SOL: Profil fotoğrafı === */}
-      <div className="profile-photo">
-        <img
-          src={profilFoto}
-          alt="Ahmet Aksoy'un profil fotoğrafı"
-          className="profile-photo__img"
-          width="104"
-          height="104"
-          loading="eager"
-        />
+      {/* === SOL: Profil fotoğrafı ===
+          .profile-ring: fotoğrafın etrafında yavaşça dönen conic-gradient
+          halka (CSS ::before). Fotoğrafın kendi beyaz çerçevesi, halka ile
+          arasında zarif bir boşluk bırakır. */}
+      <div className="profile-ring">
+        <div className="profile-photo">
+          <img
+            src={profilFoto}
+            alt="Ahmet Aksoy'un profil fotoğrafı"
+            className="profile-photo__img"
+            width="104"
+            height="104"
+            loading="eager"
+          />
+        </div>
       </div>
 
       {/* === SAĞ: İsim + bio + meta bilgiler === */}
