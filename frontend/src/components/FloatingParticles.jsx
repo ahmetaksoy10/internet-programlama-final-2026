@@ -34,10 +34,11 @@ function FloatingParticles() {
     let raf = 0
 
     // Aktif temaya göre nokta rengi (alfa ayrı veriliyor).
-    // Açık tema → sıcak koyu gri; karanlık tema → yumuşak açık ton.
+    // Açık tema → soğuk arduvaz (slate) gri; karanlık tema → yumuşak açık ton.
+    // (Arka plan paleti soğuk indigo/gök tonlarına geçince noktalar da uyumlandı.)
     function temaRengi() {
       const koyu = document.documentElement.getAttribute('data-theme') === 'dark'
-      return koyu ? '210, 214, 240' : '124, 112, 96'
+      return koyu ? '190, 200, 235' : '98, 110, 146'
     }
     let rgb = temaRengi()
 

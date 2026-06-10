@@ -7,9 +7,9 @@
 
 /* === GENEL DEĞİŞKENLER (TASARIM JETONLARI) === */
 :root {
-  /* Arka plan — çok hafif sıcak gri/krem */
-  --bg-primary: #faf8f5;
-  --bg-secondary: #f3f0eb;
+  /* Arka plan — temiz, hafif soğuk beyaz (profesyonel, nötr zemin) */
+  --bg-primary: #f7f8fb;
+  --bg-secondary: #eef0f6;
 
   /* Kart */
   --card-bg: #ffffff;
@@ -43,6 +43,7 @@
   --tint-base: #ffffff;
   --surface-2: #f8f8fa;          /* commit kutuları gibi ikincil yüzeyler */
   --dot-color: rgba(0, 0, 0, 0.04); /* GitHub kartı noktalı desen rengi */
+  --grid-dot: rgba(36, 44, 80, 0.08); /* arka plan nokta-ızgara dokusu */
 
   /* Gölgeler */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
@@ -104,41 +105,53 @@ h1, h2, h3 {
   pointer-events: none;
 }
 
-/* Aurora: yavaşça süzülen soluk pastel ışık lekeleri */
+/* Aurora: yavaşça süzülen, rafine ve soğuk tonlu ışık yıkamaları.
+   v3 — "profesyonel" palet: doygun pastel yerine düşük doygunluklu
+   indigo / gök / pudra tonları; daha geniş blur, daha kısık opaklık. */
 .aurora {
   overflow: hidden; /* blob'lar taşıp yatay kaydırma yaratmasın */
+}
+/* İnce nokta-ızgara dokusu: mühendislik/blueprint hissi veren,
+   çok silik bir desen. Alta inildikçe maskeyle kaybolur. */
+.aurora::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(var(--grid-dot) 1px, transparent 1px);
+  background-size: 26px 26px;
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent 80%);
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent 80%);
 }
 .aurora__blob {
   position: absolute;
   border-radius: 50%;
-  /* Blur biraz azaltıldı → leke daha belirgin ama yine yumuşak */
-  filter: blur(58px);
-  opacity: 0.78;
+  /* Geniş blur → leke değil, zarif bir ışık yıkaması gibi görünür */
+  filter: blur(80px);
+  opacity: 0.55;
   will-change: transform;
 }
-/* Yumuşak pastel ama bu sefer fark edilir tonlar */
 .aurora__blob--1 {
-  width: 46vw;
-  height: 46vw;
-  top: -10%;
-  left: -6%;
-  background: radial-gradient(circle at center, #ffc9ad, transparent 70%); /* şeftali */
+  width: 50vw;
+  height: 50vw;
+  top: -14%;
+  left: -8%;
+  background: radial-gradient(circle at center, #c7d2f4, transparent 70%); /* indigo */
   animation: auroraDrift1 28s ease-in-out infinite alternate;
 }
 .aurora__blob--2 {
-  width: 42vw;
-  height: 42vw;
-  top: 28%;
-  right: -8%;
-  background: radial-gradient(circle at center, #c9bdf6, transparent 70%); /* lavanta */
+  width: 44vw;
+  height: 44vw;
+  top: 30%;
+  right: -10%;
+  background: radial-gradient(circle at center, #c2e2ef, transparent 70%); /* gök */
   animation: auroraDrift2 34s ease-in-out infinite alternate;
 }
 .aurora__blob--3 {
-  width: 40vw;
-  height: 40vw;
-  bottom: -12%;
-  left: 20%;
-  background: radial-gradient(circle at center, #aee3d4, transparent 70%); /* nane */
+  width: 42vw;
+  height: 42vw;
+  bottom: -14%;
+  left: 22%;
+  background: radial-gradient(circle at center, #ecd6e3, transparent 70%); /* pudra */
   animation: auroraDrift3 31s ease-in-out infinite alternate;
 }
 
@@ -1544,11 +1557,12 @@ button:focus-visible,
 /*  (Değişkenler tek yerden değiştiği için her bileşen uyum sağlar.) */
 /* ============================================================= */
 :root[data-theme='dark'] {
-  --bg-primary: #14141b;
-  --bg-secondary: #1d1d27;
-  --card-bg: #20202c;
+  /* Derin gece laciverti — siyahımsı mor yerine kurumsal slate/navy */
+  --bg-primary: #0f1219;
+  --bg-secondary: #151a26;
+  --card-bg: #1b212e;
   /* Karanlıkta cam: koyu yarı saydam → aurora hafif sızar, metin okunur kalır */
-  --card-glass: rgba(32, 32, 44, 0.66);
+  --card-glass: rgba(27, 33, 46, 0.66);
   --card-border: rgba(255, 255, 255, 0.09);
 
   --text-primary: #f2f2f7;
@@ -1556,9 +1570,10 @@ button:focus-visible,
   --text-muted: #8a8a9e;
 
   /* color-mix zemin rengi: karanlıkta koyu olur → tinted yüzeyler doğru görünür */
-  --tint-base: #262633;
-  --surface-2: #1a1a24;
+  --tint-base: #232a3a;
+  --surface-2: #161b27;
   --dot-color: rgba(255, 255, 255, 0.05);
+  --grid-dot: rgba(168, 184, 230, 0.06); /* arka plan nokta-ızgara dokusu */
 
   /* GitHub vurgu rengi koyu griydi; karanlıkta görünür olması için açık griye çevrilir */
   --accent-github: #c7d0d8;
@@ -1570,9 +1585,20 @@ button:focus-visible,
   --shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.6);
 }
 
-/* Karanlık temada aurora biraz kısık: koyu gökyüzünde renkli bir parıltı */
+/* Karanlık temada aurora: gece göğünde derin indigo/camgöbeği parıltılar.
+   Açık temanın pastel lekeleri koyu zeminde çamurlu durur; bu yüzden
+   bloblara karanlığa özel, doygunluğu düşük derin tonlar veriyoruz. */
 :root[data-theme='dark'] .aurora__blob {
-  opacity: 0.4;
+  opacity: 0.34;
+}
+:root[data-theme='dark'] .aurora__blob--1 {
+  background: radial-gradient(circle at center, #3d4a8f, transparent 70%); /* derin indigo */
+}
+:root[data-theme='dark'] .aurora__blob--2 {
+  background: radial-gradient(circle at center, #1f5f73, transparent 70%); /* derin camgöbeği */
+}
+:root[data-theme='dark'] .aurora__blob--3 {
+  background: radial-gradient(circle at center, #5a3d6e, transparent 70%); /* derin mürdüm */
 }
 
 /* ============================================================= */
@@ -1715,36 +1741,3 @@ button:focus-visible,
   font-variant-numeric: tabular-nums;
 }
 
-/* ============================================================= */
-/*  === FARE İZİ / IŞIK HÂLESİ (CURSOR GLOW) ===                 */
-/* ============================================================= */
-/* Arka plan katmanında (z-index 0): camsı kartlar bunu blur'layıp
-   yakalar, böylece cam yüzeyler ışığa tepki veriyormuş gibi görünür. */
-.cursor-glow {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 460px;
-  height: 460px;
-  margin: -230px 0 0 -230px; /* hâlenin merkezini imlece hizala */
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0;
-  transition: opacity 0.45s ease;
-  will-change: transform;
-  background: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--accent-focus) 30%, transparent) 0%,
-    color-mix(in srgb, var(--accent-about) 16%, transparent) 38%,
-    transparent 68%
-  );
-}
-:root[data-theme='dark'] .cursor-glow {
-  background: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--accent-focus) 40%, transparent) 0%,
-    color-mix(in srgb, var(--accent-about) 26%, transparent) 40%,
-    transparent 70%
-  );
-}
