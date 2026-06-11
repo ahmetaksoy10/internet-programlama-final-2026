@@ -20,10 +20,8 @@ const kunye = [
 function AboutCard() {
   return (
     <article className="card card--about card--intro">
-      {/* Selamlama: kartın başlığı, ama başlık gibi durmayan sıcak bir açılış */}
-      <h2 className="intro__selam">
-        Merhaba, ben Ahmet<span className="intro__nokta">.</span>
-      </h2>
+      {/* Kart başlığı: büyük punto, tam metin rengi */}
+      <h2 className="intro__selam">Ben Kimim?</h2>
 
       <p className="card__text">
         Bilgisayar mühendisliği öğrencisiyim (2024 girişli) ve kod yazmak benim

@@ -34,3 +34,6 @@ frontend/dist/
 *.njsproj
 *.sln
 *.sw?
+
+.impeccable/
+.impeccable
