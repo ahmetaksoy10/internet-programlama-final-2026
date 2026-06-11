@@ -1,43 +1,45 @@
 // =============================================================
-//  AboutCard.jsx — "Kimim Ben?" kartı
+//  AboutCard.jsx — "Kimim Ben?" kartı (v2: selamlama kartı)
 // -------------------------------------------------------------
-//  Görevi: Kendimi kısa, taranabilir (scannable) maddelerle tanıtmak.
-//  Tek uzun paragraf yerine, her satırın başında küçük bir Lucide
-//  ikonu olan madde listesi kullanılır.
+//  Görevi: Kendimi şablon bullet listesi yerine, insan gibi
+//  konuşan kısa bir metinle tanıtmak. Kart, gridteki diğer
+//  kartlardan bilinçli olarak farklı bir yapıdadır:
+//  ikon kutulu başlık yok — büyük bir selamlama + düzyazı +
+//  altta küçük "kimlik kartı" satırı.
 // =============================================================
 
-import { UserRound, GraduationCap, School, MapPin, Heart } from 'lucide-react'
+import { GraduationCap, MapPin, School } from 'lucide-react'
 
-// --- Tanıtım maddeleri ---
-// Her madde: bir ikon ve bir metinden oluşur. Diziyi .map() ile listeliyoruz.
-const maddeler = [
-  { icon: GraduationCap, metin: 'BAÜN Bilgisayar Mühendisliği, 2. sınıf (2024 giriş)' },
-  { icon: School, metin: 'Balıkesir Sınav Koleji mezunu' },
+// Alt satırdaki kısa kimlik bilgileri (ikon + metin)
+const kunye = [
+  { icon: GraduationCap, metin: 'BAÜN Bilg. Müh. · 2. sınıf' },
   { icon: MapPin, metin: 'Karesi, Balıkesir' },
-  { icon: Heart, metin: 'Kod yazmayı, öğrenmeyi ve yeni şeyler denemeyi seviyorum' },
+  { icon: School, metin: 'Sınav Koleji mezunu' },
 ]
 
 function AboutCard() {
   return (
-    <article className="card card--about">
-      {/* Ghost ikon: kartın filigran kimliği (CSS .card__ghost) */}
-      <UserRound className="card__ghost" strokeWidth={1.5} aria-hidden="true" />
-      <div className="card__head">
-        <span className="card__icon" aria-hidden="true">
-          <UserRound size={20} />
-        </span>
-        <h2 className="card__title">Kimim Ben?</h2>
-      </div>
+    <article className="card card--about card--intro">
+      {/* Selamlama: kartın başlığı, ama başlık gibi durmayan sıcak bir açılış */}
+      <h2 className="intro__selam">
+        Merhaba, ben Ahmet<span className="intro__nokta">.</span>
+      </h2>
 
-      {/* İkonlu madde listesi */}
-      <ul className="info-list">
-        {maddeler.map((madde) => {
-          // İlgili maddenin ikon bileşenini değişkene alıyoruz
-          const Ikon = madde.icon
+      <p className="card__text">
+        Bilgisayar mühendisliği öğrencisiyim (2024 girişli) ve kod yazmak benim
+        için bir ders değil, bir merak işi — aklıma takılan fikri küçük bir
+        projeye dönüştürmeden rahat edemiyorum. Yeni bir şey öğrenmek,
+        denemek ve bozup yeniden yapmak günümün en sevdiğim kısmı.
+      </p>
+
+      {/* Künye satırı: en alta yaslanan, küçük ikonlu kimlik bilgileri */}
+      <ul className="intro__kunye" aria-label="Kısa bilgiler">
+        {kunye.map((bilgi) => {
+          const Ikon = bilgi.icon
           return (
-            <li key={madde.metin} className="info-item">
-              <Ikon size={17} className="info-item__icon" aria-hidden="true" />
-              <span>{madde.metin}</span>
+            <li key={bilgi.metin}>
+              <Ikon size={14} aria-hidden="true" />
+              {bilgi.metin}
             </li>
           )
         })}

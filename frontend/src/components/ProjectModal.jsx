@@ -15,6 +15,8 @@
 import { useEffect, useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { X, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react'
+// Klavye odağını modal içinde tutan ve kapanınca geri veren hook
+import useOdakTuzagi from './useOdakTuzagi.js'
 
 // Durum rozeti için renk haritası
 const DURUM_RENK = {
@@ -27,6 +29,8 @@ function ProjectModal({ proje, onClose }) {
   const [aktifGorsel, setAktifGorsel] = useState(0)
   // Otomatik geçiş, fareyle üzerine gelince duraklasın diye bir bayrak
   const [durdur, setDurdur] = useState(false)
+  // Odak tuzağı: modal açıkken Tab dışarı çıkamaz, kapanınca odak geri döner
+  const dialogRef = useOdakTuzagi(Boolean(proje))
 
   // Farklı bir proje açılınca galeriyi başa sar ve duraklatmayı sıfırla
   useEffect(() => {
@@ -84,6 +88,7 @@ function ProjectModal({ proje, onClose }) {
   return createPortal(
     <div className="modal-overlay" onClick={onClose} role="presentation">
       <div
+        ref={dialogRef}
         className="modal"
         role="dialog"
         aria-modal="true"

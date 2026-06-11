@@ -18,10 +18,12 @@
   --card-glass: rgba(255, 255, 255, 0.72);
   --card-border: rgba(0, 0, 0, 0.06);
 
-  /* Metin renkleri */
+  /* Metin renkleri.
+     --text-muted: küçük punto etiketlerde de kullanıldığı için
+     WCAG AA (≥4.5:1) sınırını beyaz kart VE gri zemin üzerinde geçen ton. */
   --text-primary: #1a1a2e;
   --text-secondary: #555566;
-  --text-muted: #8888a0;
+  --text-muted: #6a6a82;
 
   /* Vurgu renkleri — her kart için farklı */
   --accent-about: #6c63ff;       /* Mor — Hakkımda */
@@ -262,8 +264,8 @@ button:focus-visible,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
+  width: 44px; /* WCAG dokunma hedefi: en az 44x44px */
+  height: 44px;
   border-radius: 50%;
   border: 1px solid var(--card-border);
   background: var(--card-bg);
@@ -347,26 +349,16 @@ button:focus-visible,
   margin-bottom: 0.35rem;
 }
 
-/* İsim: sayfanın odak noktası. Dev boyut + gradient dolgu.
-   Gradient, metnin kendisine boyanır (background-clip: text) —
-   koyu zeminden markanın mor/mercan tonlarına akan bir geçiş.
-   Tema değişkenleri sayesinde karanlıkta otomatik uyum sağlar. */
+/* İsim: sayfanın odak noktası. Dev boyut, tam koyu mürekkep —
+   sakin ve kendinden emin; süs yok, hiyerarşiyi boyut taşır. */
 .header__name {
   font-size: clamp(3rem, 7.5vw, 5.4rem);
   font-weight: 800;
   letter-spacing: -0.035em;
   line-height: 1.04;
   padding-bottom: 0.08em; /* g, y gibi sarkan harfler kırpılmasın */
-  background: linear-gradient(
-    94deg,
-    var(--text-primary) 25%,
-    var(--accent-about) 72%,
-    var(--accent-focus) 108%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent; /* bg-clip desteklemeyen tarayıcıda da kaza olmaz */
+  color: var(--text-primary);
+  text-wrap: balance;
 }
 
 /* "Staja açığım" rozeti: yeşil radar noktası + kısa etiket.
@@ -381,7 +373,8 @@ button:focus-visible,
   background: color-mix(in srgb, #00b894 11%, var(--tint-base));
   border: 1px solid color-mix(in srgb, #00b894 32%, transparent);
   box-shadow: var(--shadow-sm);
-  color: color-mix(in srgb, #00b894 78%, var(--text-primary));
+  /* %50 yeşil + %50 metin rengi: küçük puntoda da ≥4.5:1 kontrast */
+  color: color-mix(in srgb, #00b894 50%, var(--text-primary));
   font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.01em;
@@ -461,7 +454,10 @@ button:focus-visible,
   /* Üst kenarda kartın kendi vurgu rengiyle ince bir çizgi */
   border-top: 3px solid var(--card-accent, var(--accent-about));
   border-radius: var(--radius-md);
-  padding: 1.5rem;
+  /* Padding değişkende: tam-genişlik (full-bleed) içerikler negatif
+     margin ile bu değeri kullanır → mobil padding'le otomatik uyumlu */
+  --card-pad: 1.5rem;
+  padding: var(--card-pad);
   box-shadow: var(--shadow-md);
   /* Hover + belirme geçişleri (yumuşak cubic-bezier eğrisi) */
   transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
@@ -624,8 +620,10 @@ button:focus-visible,
   gap: 0.3rem;
   padding: 0.25rem 0.6rem;
   border-radius: 999px;
-  background: var(--accent-focus);
-  color: #fff;
+  /* Saf mercan + beyaz metin 2.8:1'de kalıyordu; metin rengine karıştırılmış
+     mercan zemin + kart rengi metin iki temada da ≥4.5:1 verir. */
+  background: color-mix(in srgb, var(--accent-focus) 72%, var(--text-primary));
+  color: var(--card-bg);
   font-size: 0.72rem;
   font-weight: 700;
 }
@@ -647,7 +645,7 @@ button:focus-visible,
   );
   border: 1px dashed color-mix(in srgb, var(--card-accent, var(--accent-about)) 35%, var(--tint-base));
   border-radius: var(--radius-sm);
-  color: color-mix(in srgb, var(--card-accent, var(--accent-about)) 70%, var(--text-muted));
+  color: color-mix(in srgb, var(--card-accent, var(--accent-about)) 50%, var(--text-primary));
   text-align: center;
   overflow: hidden;
 }
@@ -688,7 +686,7 @@ button:focus-visible,
   gap: 0.3rem;
   font-size: 0.73rem;
   font-weight: 700;
-  color: color-mix(in srgb, var(--card-accent) 75%, var(--text-muted));
+  color: color-mix(in srgb, var(--card-accent) 50%, var(--text-primary));
   padding: 0.15rem 0.5rem;
   border-radius: 999px;
   background: color-mix(in srgb, var(--card-accent) 10%, var(--tint-base));
@@ -772,7 +770,8 @@ button:focus-visible,
   font-size: 0.74rem;
   font-weight: 700;
   background: color-mix(in srgb, var(--card-accent) 14%, var(--tint-base));
-  color: color-mix(in srgb, var(--card-accent) 72%, var(--text-primary));
+  /* %50 accent + %50 metin rengi: en açık accent'ta (turkuaz) bile ≥4.5:1 kontrast */
+  color: color-mix(in srgb, var(--card-accent) 50%, var(--text-primary));
   /* Hover mikro-etkileşimi için yumuşak geçiş */
   transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
               background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
@@ -782,7 +781,7 @@ button:focus-visible,
 .tag:hover {
   transform: translateY(-2px);
   background: color-mix(in srgb, var(--card-accent) 24%, var(--tint-base));
-  color: color-mix(in srgb, var(--card-accent) 88%, var(--text-primary));
+  color: color-mix(in srgb, var(--card-accent) 45%, var(--text-primary));
   box-shadow: 0 3px 8px color-mix(in srgb, var(--card-accent) 22%, transparent);
 }
 
@@ -801,7 +800,9 @@ button:focus-visible,
   margin-bottom: 0.35rem;
 }
 .progress__value {
-  color: var(--card-accent);
+  /* Saf accent açık tonlarda (turkuaz/yeşil) beyaz üstünde okunmaz;
+     metin rengine karıştırılmış hali iki temada da AA kontrastını geçer. */
+  color: color-mix(in srgb, var(--card-accent) 55%, var(--text-primary));
 }
 .progress__track {
   height: 9px;
@@ -850,7 +851,7 @@ button:focus-visible,
   padding: 0.25rem 0.7rem;
   border-radius: 999px;
   background: color-mix(in srgb, var(--card-accent) 14%, var(--tint-base));
-  color: color-mix(in srgb, var(--card-accent) 70%, var(--text-primary));
+  color: color-mix(in srgb, var(--card-accent) 50%, var(--text-primary));
   font-size: 0.8rem;
   font-weight: 700;
   margin-bottom: 0.75rem;
@@ -955,7 +956,7 @@ button:focus-visible,
   font-size: 0.82rem;
   font-weight: 700;
   background: color-mix(in srgb, var(--card-accent) 12%, var(--tint-base));
-  color: color-mix(in srgb, var(--card-accent) 75%, var(--text-primary));
+  color: color-mix(in srgb, var(--card-accent) 50%, var(--text-primary));
   border: 1px solid color-mix(in srgb, var(--card-accent) 22%, var(--tint-base));
   transition: background 0.25s ease, transform 0.25s ease;
 }
@@ -1011,7 +1012,12 @@ button:focus-visible,
   align-items: center;
   justify-content: center;
   color: #fff;
-  background: linear-gradient(135deg, var(--card-accent), #55efc4);
+  /* İkinci durak elle hex yerine accent'tan türetilir (Türetme Kuralı) */
+  background: linear-gradient(
+    135deg,
+    var(--card-accent),
+    color-mix(in srgb, var(--card-accent) 55%, var(--tint-base))
+  );
   box-shadow: var(--shadow-md);
 }
 /* Gerçek kapak görseli: kutuyu tam doldurur */
@@ -1070,25 +1076,45 @@ button:focus-visible,
 }
 
 /* ============================================================= */
-/*  === KİMİM BEN? — ikonlu madde listesi ===                    */
+/*  === KİMİM BEN? v2 — selamlama kartı ===                      */
+/*  Diğer kartların ikon kutulu başlık şablonunu bilinçli kırar: */
+/*  büyük selamlama + düzyazı + altta künye satırı.              */
 /* ============================================================= */
-.info-list {
-  list-style: none;
+.card--intro {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem; /* satırlar arası rahat boşluk */
 }
-.info-item {
+.intro__selam {
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--text-primary);
+  margin-bottom: 0.55rem;
+}
+.intro__nokta {
+  color: var(--card-accent);
+}
+/* Künye: kartın en altına yaslanan küçük ikonlu bilgi satırı */
+.intro__kunye {
+  list-style: none;
   display: flex;
-  align-items: flex-start;
-  gap: 0.6rem;
-  color: var(--text-secondary);
-  font-size: 0.94rem;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  margin-top: auto;
+  padding-top: 0.95rem;
+  border-top: 1px solid var(--card-border);
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-muted);
 }
-.info-item__icon {
+.intro__kunye li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.intro__kunye svg {
   color: var(--card-accent);
   flex-shrink: 0;
-  margin-top: 0.1rem; /* ikon ilk satırla hizalı dursun */
 }
 
 /* ============================================================= */
@@ -1107,7 +1133,8 @@ button:focus-visible,
   margin-left: auto; /* başlık satırında sağa yasla */
   font-size: 0.78rem;
   font-weight: 700;
-  color: #00a844;
+  /* Tema-duyarlı yeşil: aydınlıkta koyulaşır, karanlıkta açılır (AA kontrast) */
+  color: color-mix(in srgb, var(--accent-battery) 55%, var(--text-primary));
 }
 .live-dot {
   width: 8px;
@@ -1195,7 +1222,7 @@ button:focus-visible,
   flex-shrink: 0;
 }
 .gh-error {
-  color: var(--accent-focus);
+  color: color-mix(in srgb, var(--accent-focus) 55%, var(--text-primary));
   font-weight: 600;
   background: color-mix(in srgb, var(--accent-focus) 8%, var(--tint-base));
   padding: 0.7rem 0.9rem;
@@ -1250,7 +1277,7 @@ button:focus-visible,
   font-size: 0.72rem;
   font-weight: 700;
   background: color-mix(in srgb, var(--card-accent) 12%, var(--tint-base));
-  color: color-mix(in srgb, var(--card-accent) 70%, var(--text-primary));
+  color: color-mix(in srgb, var(--card-accent) 50%, var(--text-primary));
 }
 .commit-item__msg {
   display: flex;
@@ -1342,8 +1369,25 @@ button:focus-visible,
 }
 
 /* ============================================================= */
-/*  === ENERJİ SEVİYESİ (BATTERY) KARTI ===                      */
+/*  === ENERJİ SEVİYESİ (BATTERY) KARTI — stat-first ===          */
+/*  Şablon kırıcı varyant: ikon kutulu başlık yerine küçük etiket */
+/*  + dev yüzde ve batarya yan yana (kahraman satır).             */
 /* ============================================================= */
+/* Küçük başlık etiketi (semantik h2, görsel etiket) */
+.stat-label {
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--text-muted);
+  margin-bottom: 0.8rem;
+}
+/* Kahraman satır: dev yüzde + batarya grafiği yan yana */
+.stat-hero {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  margin-bottom: 0.8rem;
+}
 /* Batarya çerçevesi (CSS ile çizim) */
 .battery-container {
   width: 90px;
@@ -1352,7 +1396,7 @@ button:focus-visible,
   border-radius: 6px;
   padding: 3px;
   position: relative;
-  margin: 0.5rem auto 0;
+  flex-shrink: 0;
 }
 /* Batarya başı (sağdaki küçük çıkıntı) */
 .battery-container::after {
@@ -1372,13 +1416,13 @@ button:focus-visible,
   border-radius: 3px;
   transition: width 0.5s ease, background-color 0.5s ease;
 }
-/* Büyük yüzde yazısı */
+/* Büyük yüzde yazısı — kahraman satırın solunda, kartın görsel odağı */
 .battery-percent {
-  text-align: center;
   font-family: 'Outfit', sans-serif;
-  font-size: 2rem;
+  font-size: 2.6rem;
   font-weight: 700;
-  margin: 0.6rem 0 0.4rem;
+  line-height: 1;
+  margin: 0;
 }
 /* Esprili durum mesajı */
 .battery-status {
@@ -1483,6 +1527,11 @@ button:focus-visible,
   /* Alt kısımda rahat nefes payı */
   padding-bottom: 2rem;
 }
+/* Odak tuzağı açılışta odağı kapsayıcıya verir (butona değil) —
+   kapsayıcının kendisi görsel halka çizmez, klavye halkaları butonlarda kalır */
+.modal:focus {
+  outline: none;
+}
 
 /* Sağ üst kapatma butonu — galerinin üstüne çıkar, belirgin/kontrastlı */
 .modal__close {
@@ -1572,8 +1621,8 @@ button:focus-visible,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   border: none;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.35);
@@ -1587,6 +1636,14 @@ button:focus-visible,
 }
 .modal__gallery-arrow--left  { left: 0.65rem; }
 .modal__gallery-arrow--right { right: 0.65rem; }
+
+/* Dokunmatik cihazlarda ok butonları en az 44x44px (WCAG hedef boyutu) */
+@media (pointer: coarse) {
+  .modal__gallery-arrow {
+    width: 44px;
+    height: 44px;
+  }
+}
 
 /* Thumbnail şeridi — ortalanmış, rahat tıklanabilir */
 .modal__thumbs {
@@ -1669,15 +1726,15 @@ button:focus-visible,
 }
 .status--done {
   background: color-mix(in srgb, #00b894 16%, var(--tint-base));
-  color: color-mix(in srgb, #00b894 80%, var(--text-primary));
+  color: color-mix(in srgb, #00b894 50%, var(--text-primary));
 }
 .status--wip {
   background: color-mix(in srgb, #f0a500 16%, var(--tint-base));
-  color: color-mix(in srgb, #f0a500 90%, var(--text-primary));
+  color: color-mix(in srgb, #f0a500 50%, var(--text-primary));
 }
 .status--active {
   background: color-mix(in srgb, #0984e3 16%, var(--tint-base));
-  color: color-mix(in srgb, #0984e3 80%, var(--text-primary));
+  color: color-mix(in srgb, #0984e3 50%, var(--text-primary));
 }
 
 /* ── İÇERİK ALANI ── */
@@ -1712,7 +1769,9 @@ button:focus-visible,
   padding: 0.8rem 1.25rem;
   border-radius: var(--radius-md);
   background: var(--card-accent);
-  color: #fff;
+  /* Turkuaz zemin beyaz metni taşımaz (1.9:1); sabit koyu mürekkep
+     iki temada da 9:1+ kontrast verir (zemin her zaman accent). */
+  color: #10151f;
   text-decoration: none;
   font-weight: 700;
   font-size: 0.95rem;
@@ -1853,7 +1912,7 @@ button:focus-visible,
     justify-content: center;
   }
   .card {
-    padding: 1.3rem;
+    --card-pad: 1.3rem;
   }
 }
 

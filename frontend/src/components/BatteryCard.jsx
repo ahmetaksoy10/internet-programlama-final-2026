@@ -28,29 +28,28 @@ function BatteryCard() {
   const renk = bataryaRengi(energyLevel)
 
   return (
-    <article className="card card--battery">
+    // .card--stat: ikon kutulu başlık şablonunu kırar — sayı önde,
+    // başlık küçük bir etiket olarak üstte durur (stat-first yapı).
+    <article className="card card--battery card--stat">
       {/* Ghost ikon: kartın filigran kimliği (CSS .card__ghost) */}
       <Coffee className="card__ghost" strokeWidth={1.5} aria-hidden="true" />
-      <div className="card__head">
-        <span className="card__icon" aria-hidden="true">
-          <Coffee size={20} />
-        </span>
-        <h2 className="card__title">Enerji Seviyesi</h2>
-      </div>
 
-      {/* CSS ile çizilmiş batarya: çerçeve + içinde yüzdeye göre dolan kısım */}
-      <div className="battery-container" role="img" aria-label={`Enerji %${energyLevel}`}>
-        {/* Dolu kısmın genişliği ve rengi inline style ile yüzdeden geliyor */}
-        <div
-          className="battery-fill"
-          style={{ width: `${energyLevel}%`, backgroundColor: renk }}
-        />
-      </div>
+      {/* Başlık: görsel olarak küçük etiket, semantik olarak yine h2 */}
+      <h2 className="stat-label">Enerji Seviyesi</h2>
 
-      {/* Büyük yüzde yazısı (renk de yüzdeye göre, sayı animasyonla artar) */}
-      <p className="battery-percent" style={{ color: renk }}>
-        %<CountUp value={energyLevel} />
-      </p>
+      {/* Kahraman satır: dev yüzde + yanında CSS ile çizilmiş batarya */}
+      <div className="stat-hero">
+        <p className="battery-percent" style={{ color: renk }}>
+          %<CountUp value={energyLevel} />
+        </p>
+        <div className="battery-container" role="img" aria-label={`Enerji %${energyLevel}`}>
+          {/* Dolu kısmın genişliği ve rengi inline style ile yüzdeden geliyor */}
+          <div
+            className="battery-fill"
+            style={{ width: `${energyLevel}%`, backgroundColor: renk }}
+          />
+        </div>
+      </div>
 
       {/* Esprili durum mesajı + kahve ikonu */}
       <p className="battery-status">

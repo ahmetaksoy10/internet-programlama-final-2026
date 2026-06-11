@@ -9,7 +9,7 @@
 
 import { useState } from 'react'
 // Lucide React ikonları (sistem emojisi yerine tutarlı SVG ikonlar)
-import { Sparkles, MapPin, CalendarClock } from 'lucide-react'
+import { MapPin, CalendarClock } from 'lucide-react'
 // Aydınlık/karanlık tema değiştirici buton
 import ThemeToggle from './ThemeToggle.jsx'
 // Bio ilk cümlesini harf harf yazan efekt (kolayca kaldırılabilir — aşağıya bak)

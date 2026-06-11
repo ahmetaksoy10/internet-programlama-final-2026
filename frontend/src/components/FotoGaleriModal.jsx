@@ -16,11 +16,15 @@
 import { useEffect, useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { X, MapPin, ChevronLeft, ChevronRight } from 'lucide-react'
+// Klavye odağını modal içinde tutan ve kapanınca geri veren hook
+import useOdakTuzagi from './useOdakTuzagi.js'
 
 function FotoGaleriModal({ baslik, fotolar, acikIndex, onClose }) {
   const acik = acikIndex !== null
   const [aktif, setAktif] = useState(0)
   const fotoSayisi = fotolar.length
+  // Odak tuzağı: modal açıkken Tab dışarı çıkamaz, kapanınca odak geri döner
+  const dialogRef = useOdakTuzagi(acik)
 
   // Modal her açılışında, tıklanan fotoğraftan başla
   useEffect(() => {
@@ -59,6 +63,7 @@ function FotoGaleriModal({ baslik, fotolar, acikIndex, onClose }) {
   return createPortal(
     <div className="modal-overlay" onClick={onClose} role="presentation">
       <div
+        ref={dialogRef}
         className="modal modal--foto"
         role="dialog"
         aria-modal="true"
